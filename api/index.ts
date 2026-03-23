@@ -1,5 +1,5 @@
 import express from "express";
-import { createServer as createViteServer } from "vite";
+// Vite is imported dynamically for dev mode to keep the serverless function lightweight.
 import path from "path";
 import { fileURLToPath } from "url";
 import { createServer } from "http";
@@ -445,6 +445,7 @@ app.put("/api/occurrences/:id/status", async (req, res) => {
 
 async function setupVite() {
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true, hmr: { server: httpServer } },
       appType: "spa",
