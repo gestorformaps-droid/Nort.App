@@ -1210,11 +1210,11 @@ function SplashPage({ onNext }: { onNext: () => void }) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
             onClick={onNext}
-            className="absolute bottom-10 right-10 z-20 flex items-center gap-2 group"
+            className="absolute bottom-6 right-6 sm:bottom-10 sm:right-10 z-[100] flex items-center gap-2 group bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/10"
           >
-            <span className="text-lg font-medium tracking-wide text-blue-400/40 transition-colors group-hover:text-blue-300/70">Next</span>
-            <div className="w-8 h-8 bg-white/5 backdrop-blur-md rounded-full flex items-center justify-center group-hover:bg-white/15 transition-all border border-white/5">
-              <ChevronRight size={18} className="text-blue-400/40" />
+            <span className="text-sm sm:text-lg font-bold tracking-wider text-blue-400 transition-colors group-hover:text-blue-300">Próximo</span>
+            <div className="w-8 h-8 flex items-center justify-center transition-all">
+              <ChevronRight size={20} className="text-blue-400 group-hover:translate-x-0.5 transition-transform" />
             </div>
           </motion.button>
         )}
