@@ -1025,7 +1025,7 @@ export default function App() {
           </div>
         </header>
 
-        <div className="p-3 sm:p-4 lg:p-8 max-w-[1600px] mx-auto w-full flex-1 flex flex-col min-h-0 no-scrollbar overflow-y-auto">
+        <div className="p-2 sm:p-3 lg:p-6 max-w-[1440px] mx-auto w-full flex-1 flex flex-col min-h-0 no-scrollbar overflow-y-auto">
           <AnimatePresence mode="wait">
             {activeTab === 'profile' && (
               <motion.div 
@@ -1352,7 +1352,7 @@ function AuthPage({ view, setView, setUser }: { view: 'login' | 'register', setV
           animate={{ opacity: 1, y: 0 }}
           className={cn(
             "w-full transition-all duration-500 z-10",
-            view === 'login' ? "max-w-[380px]" : "max-w-[380px] md:max-w-[600px]"
+            view === 'login' ? "max-w-[340px]" : "max-w-[340px] md:max-w-[540px]"
           )}
         >
         <div className="bg-white/5 backdrop-blur-2xl rounded-[32px] border border-white/10 shadow-2xl overflow-hidden">
@@ -1715,7 +1715,7 @@ function ProfileView({ user, onUpdate, onUserUpdate, canToggleStatus = true, rea
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
       <div className="lg:col-span-1 space-y-4 lg:space-y-6">
-        <div className="bg-white p-6 lg:p-8 rounded-2xl border border-slate-200 text-center shadow-sm">
+        <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 text-center shadow-sm">
           <div className="relative w-28 h-28 sm:w-32 sm:h-32 lg:w-40 lg:h-40 mx-auto mb-4 lg:mb-6 group">
             <div className="w-full h-full bg-slate-100 rounded-full flex items-center justify-center border-4 border-slate-50 overflow-hidden shadow-inner">
               {user.avatar_url ? (
