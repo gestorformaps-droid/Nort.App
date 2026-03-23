@@ -1816,6 +1816,26 @@ function DashboardNewRecordView({ user, locations, employees, onSuccess }: { use
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [currentPos, setCurrentPos] = useState<{ latitude: number, longitude: number } | null>(null);
+
+  useEffect(() => {
+    let watchId: number;
+    if (navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          setCurrentPos({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          });
+        },
+        (err) => console.log('Radar GPS error:', err),
+        { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 }
+      );
+    }
+    return () => {
+      if (watchId) navigator.geolocation.clearWatch(watchId);
+    };
+  }, []);
   const [searchEmp, setSearchEmp] = useState('');
   const [showEmpList, setShowEmpList] = useState(false);
   const [searchLoc, setSearchLoc] = useState('');
@@ -1855,27 +1875,21 @@ function DashboardNewRecordView({ user, locations, employees, onSuccess }: { use
     setLoading(true);
     setError('');
 
-    // Capture Geolocation
     if (!navigator.geolocation) {
       setError('Geolocalização não suportada pelo seu navegador');
       setLoading(false);
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(async (position) => {
-      const { latitude, longitude, accuracy } = position.coords;
-      
-      // Optional: Log accuracy for debugging
-      console.log(`Location captured: ${latitude}, ${longitude} (Accuracy: ${accuracy}m)`);
-
+    const saveRecord = async (lat: number, lon: number) => {
       try {
         const res = await fetch('/api/activities', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             ...formData,
-            latitude,
-            longitude,
+            latitude: lat,
+            longitude: lon,
             user_id: user.id
           })
         });
@@ -1890,19 +1904,28 @@ function DashboardNewRecordView({ user, locations, employees, onSuccess }: { use
       } finally {
         setLoading(false);
       }
-    }, (err) => {
-      let msg = 'Erro ao capturar geolocalização.';
-      if (err.code === err.PERMISSION_DENIED) msg = 'Permissão de geolocalização negada. Por favor, habilite o acesso.';
-      else if (err.code === err.POSITION_UNAVAILABLE) msg = 'Posição indisponível. Verifique seu GPS.';
-      else if (err.code === err.TIMEOUT) msg = 'Tempo esgotado ao capturar localização. Tente novamente.';
-      
-      setError(msg);
-      setLoading(false);
-    }, {
-      enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 0
-    });
+    };
+
+    if (currentPos) {
+      await saveRecord(currentPos.latitude, currentPos.longitude);
+    } else {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
+        await saveRecord(latitude, longitude);
+      }, (err) => {
+        let msg = 'Erro ao capturar geolocalização.';
+        if (err.code === err.PERMISSION_DENIED) msg = 'Permissão de geolocalização negada. Por favor, habilite o acesso.';
+        else if (err.code === err.POSITION_UNAVAILABLE) msg = 'Posição indisponível. Verifique seu GPS.';
+        else if (err.code === err.TIMEOUT) msg = 'Tempo esgotado ao capturar localização. Tente novamente.';
+        
+        setError(msg);
+        setLoading(false);
+      }, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 15000
+      });
+    }
   };
 
   // Haversine formula
