@@ -404,7 +404,7 @@ const Select = ({ label, options, error, ...props }: React.SelectHTMLAttributes<
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
-  const [view, setView] = useState<'splash' | 'landing' | 'login' | 'register' | 'dashboard'>('splash');
+  const [view, setView] = useState<'login' | 'register' | 'dashboard'>('login');
   const [activeTab, setActiveTab] = useState<'profile' | 'new' | 'list' | 'manager' | 'manager_records' | 'manager_employees' | 'occurrences'>('profile');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -533,7 +533,7 @@ export default function App() {
     localStorage.removeItem('user');
     setUser(null);
     setNotifications([]);
-    setView('splash');
+    setView('login');
   }, []);
 
 
@@ -639,14 +639,6 @@ export default function App() {
     setActiveTab(tab);
     setIsMobileMenuOpen(false);
   };
-
-  if (view === 'splash') {
-    return <SplashPage onNext={() => setView('landing')} />;
-  }
-
-  if (view === 'landing') {
-    return <LandingPage onLogin={() => setView('login')} />;
-  }
 
   if (view === 'login' || view === 'register') {
     return <AuthPage view={view} setView={setView} setUser={(u) => {
@@ -1083,114 +1075,6 @@ function Logo({ className }: { className?: string }) {
         transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
         className="w-10 h-8 border-x-[5px] border-t-[5px] border-white rounded-t-md mt-0.5" 
       />
-    </div>
-  );
-}
-
-// --- Splash Page ---
-
-function SplashPage({ onNext }: { onNext: () => void }) {
-  const [showButton, setShowButton] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowButton(true), 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  return (
-    <div className="h-[100dvh] bg-[#00153D] flex items-center justify-center relative overflow-hidden font-sans">
-      {/* Background Gradient Effect */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#1A3A8A] via-[#00153D] to-[#000B26]" />
-      
-      {/* Decorative Glows */}
-      <div className="absolute top-[-10%] right-[-10%] w-[80%] h-[60%] bg-blue-500/20 blur-[120px] rounded-full" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[60%] h-[50%] bg-blue-600/10 blur-[100px] rounded-full" />
-
-      {/* Animated Logo */}
-      <div className="relative z-10">
-        <Logo className="scale-110" />
-      </div>
-
-      {/* Next Button in Bottom Right */}
-      <AnimatePresence>
-        {showButton && (
-          <motion.button
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            onClick={onNext}
-            className="absolute bottom-6 right-6 sm:bottom-10 sm:right-10 z-[100] flex items-center gap-2 group bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full backdrop-blur-md border border-white/10"
-          >
-            <span className="text-sm sm:text-lg font-bold tracking-wider text-blue-400 transition-colors group-hover:text-blue-300">Próximo</span>
-            <div className="w-8 h-8 flex items-center justify-center transition-all">
-              <ChevronRight size={20} className="text-blue-400 group-hover:translate-x-0.5 transition-transform" />
-            </div>
-          </motion.button>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-// --- Landing Page ---
-
-function LandingPage({ onLogin }: { onLogin: () => void }) {
-  return (
-    <div className="h-[100dvh] bg-[#00153D] flex flex-col items-center justify-end p-8 relative overflow-hidden font-sans">
-      {/* Background Gradient Effect */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#1A3A8A] via-[#00153D] to-[#000B26]" />
-      
-      {/* Decorative Glows */}
-      <div className="absolute top-[-20%] right-[-10%] w-[80%] h-[60%] bg-blue-500/20 blur-[120px] rounded-full" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[60%] h-[50%] bg-blue-600/10 blur-[100px] rounded-full" />
-
-      <div className="w-full max-w-md z-10 space-y-6 mb-8">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="space-y-1"
-        >
-          <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-tighter leading-none">
-            nort.
-          </h1>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
-            inteligência<br />
-            de <span className="text-[#3B82F6]">campo.</span>
-          </h2>
-          <p className="text-white/70 text-sm sm:text-base font-medium pt-2">
-            Conectando pessoas e operações.
-          </p>
-        </motion.div>
-
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 1 }}
-          className="w-32 h-1 bg-white/10 rounded-full overflow-hidden"
-        >
-          <motion.div 
-            initial={{ x: "-100%" }}
-            animate={{ x: "0%" }}
-            transition={{ duration: 1.5, ease: "easeInOut" }}
-            className="h-full w-1/2 bg-gradient-to-r from-blue-600 to-blue-400 rounded-full"
-          />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.6 }}
-          className="pt-6 flex justify-center"
-        >
-          <button 
-            onClick={onLogin}
-            className="px-10 py-2.5 sm:px-12 sm:py-3 bg-[#1D4ED8] hover:bg-blue-600 text-white rounded-2xl font-bold text-sm sm:text-base shadow-xl shadow-blue-900/40 transition-all active:scale-[0.98] flex items-center justify-center"
-          >
-            Login
-          </button>
-        </motion.div>
-      </div>
     </div>
   );
 }
