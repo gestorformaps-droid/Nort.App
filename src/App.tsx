@@ -657,7 +657,7 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC] overflow-hidden relative">
+    <div className="flex h-[100dvh] bg-[#F8FAFC] overflow-hidden relative">
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
@@ -821,7 +821,7 @@ export default function App() {
           <div className="flex items-center gap-3 overflow-hidden">
             <button 
               onClick={() => setIsMobileMenuOpen(true)}
-              className="p-2 text-white hover:bg-white/10 rounded-lg lg:hidden shrink-0"
+              className="p-3 -ml-2 text-white hover:bg-white/10 rounded-lg lg:hidden shrink-0"
             >
               <Menu size={24} strokeWidth={2.5} />
             </button>
@@ -1098,7 +1098,7 @@ function SplashPage({ onNext }: { onNext: () => void }) {
   }, []);
 
   return (
-    <div className="h-screen bg-[#00153D] flex items-center justify-center relative overflow-hidden font-sans">
+    <div className="h-[100dvh] bg-[#00153D] flex items-center justify-center relative overflow-hidden font-sans">
       {/* Background Gradient Effect */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#1A3A8A] via-[#00153D] to-[#000B26]" />
       
@@ -1136,7 +1136,7 @@ function SplashPage({ onNext }: { onNext: () => void }) {
 
 function LandingPage({ onLogin }: { onLogin: () => void }) {
   return (
-    <div className="h-screen bg-[#00153D] flex flex-col items-center justify-end p-8 relative overflow-hidden font-sans">
+    <div className="h-[100dvh] bg-[#00153D] flex flex-col items-center justify-end p-8 relative overflow-hidden font-sans">
       {/* Background Gradient Effect */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#1A3A8A] via-[#00153D] to-[#000B26]" />
       
@@ -1248,7 +1248,7 @@ function AuthPage({ view, setView, setUser }: { view: 'login' | 'register', setV
   };
 
   return (
-    <div className="h-screen w-full bg-[#00153D] relative overflow-hidden flex flex-col">
+    <div className="h-[100dvh] w-full bg-[#00153D] relative overflow-hidden flex flex-col">
       <div className="flex-1 w-full overflow-y-auto no-scrollbar">
       <div className="min-h-full w-full flex items-center justify-center p-4 lg:p-6 relative z-10">
         {/* Background Decorative Elements */}
@@ -1296,7 +1296,7 @@ function AuthPage({ view, setView, setUser }: { view: 'login' | 'register', setV
             </div>
           </div>
           
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto max-h-[80dvh]">
             {error && (
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -2792,7 +2792,7 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <DashboardStatCard label="Total" value={stats.total} icon={<ClipboardList size={18} />} color="bg-slate-900" />
           <DashboardStatCard label="Concluídas" value={stats.completed} icon={<CheckCircle2 size={18} />} color="bg-blue-500" />
           <DashboardStatCard label="Em Andamento" value={stats.inProgress} icon={<Clock size={18} />} color="bg-yellow-500" />
@@ -3037,7 +3037,7 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
                     <div className="w-1 h-4 bg-blue-600 rounded-full" />
                     <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Informações Gerais</h4>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
                       <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Status</p>
                       <div className="flex items-center gap-2">
@@ -3132,7 +3132,7 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
                     <div className="w-1 h-4 bg-blue-600 rounded-full" />
                     <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Métricas de Tempo</h4>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
                       <div className="flex items-center gap-2 mb-1">
                         <Clock size={14} className="text-blue-600" />
@@ -3476,7 +3476,7 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 mt-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-8">
               {chartData.map(item => (
                 <div key={item.name} className="p-3 bg-slate-50 rounded-xl border border-slate-100">
                   <div className="flex items-center gap-2 mb-1">
@@ -3510,7 +3510,7 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-slate-50 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+              className="relative w-full max-w-2xl bg-slate-50 rounded-3xl shadow-2xl overflow-hidden max-h-[90dvh] flex flex-col"
             >
               <div className="p-4 lg:p-6 border-b border-slate-100 bg-white flex items-center justify-between sticky top-0 z-10">
                 <div className="flex items-center gap-3 min-w-0">
@@ -3539,7 +3539,7 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
               
               <div id="detailed-report-content" className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 lg:space-y-8 bg-slate-50 no-scrollbar">
                 {/* Metrics */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
                     <div className="flex items-center gap-2 mb-2">
                       <Clock size={16} className="text-blue-600" />
@@ -3556,7 +3556,7 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
                   </div>
                 </div>
                 {/* General Info */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Operação</p>
                     <p className="text-sm font-bold text-slate-900">{selectedActivity.operation}</p>
@@ -3739,7 +3739,7 @@ function DashboardEmployeesView({ employees, activities, onUpdate, initialEmploy
               placeholder="Buscar por nome ou matrícula..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full bg-white border border-slate-200 rounded-xl py-2.5 lg:py-2 pl-10 pr-4 text-xs lg:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all shadow-sm"
+              className="w-full bg-white border border-slate-200 rounded-xl py-2.5 lg:py-2 pl-10 pr-4 text-xs lg:text-base lg:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all shadow-sm"
             />
           </div>
           <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 self-start sm:self-auto shadow-sm">
@@ -4017,14 +4017,14 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
             placeholder="Buscar ocorrências..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm"
           />
         </div>
         <div className="flex items-center gap-3">
           <select 
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm"
+            className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm"
           >
             <option value="Todas">Todas as Categorias</option>
             <option value="Segurança">Segurança</option>
@@ -4038,7 +4038,7 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
               type="date"
               value={filterDate}
               onChange={(e) => setFilterDate(e.target.value)}
-              className="pl-10 pr-2 lg:pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px]"
+              className="pl-10 pr-2 lg:pr-4 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px]"
             />
           </div>
         </div>
@@ -4179,7 +4179,7 @@ function DashboardAddOccurrenceModal({ onClose, onSave, loading, initialLocation
           </button>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto max-h-[80dvh]">
           <Input 
             label="Título da Ocorrência"
             placeholder="Ex: Vazamento de óleo, Falha mecânica..."
@@ -4188,7 +4188,7 @@ function DashboardAddOccurrenceModal({ onClose, onSave, loading, initialLocation
             required
           />
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Select 
               label="Categoria"
               value={formData.type}
@@ -4212,7 +4212,7 @@ function DashboardAddOccurrenceModal({ onClose, onSave, loading, initialLocation
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-slate-700">Descrição Detalhada</label>
             <textarea 
-              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none min-h-[120px] resize-none"
+              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none min-h-[120px] resize-none"
               placeholder="Descreva o que ocorreu com o máximo de detalhes possível..."
               value={formData.description}
               onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
@@ -4439,7 +4439,7 @@ function DashboardsView({ activities, occurrences, employees }: { activities: Ac
         )}
       </div>
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           {
             label: 'Total de Atividades',
