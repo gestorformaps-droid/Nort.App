@@ -2681,14 +2681,14 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
   }), [filteredActivities]);
 
   return (
-    <div className="lg:grid lg:grid-cols-[380px_1fr] lg:gap-5 space-y-4 lg:space-y-0 relative">
+    <div className="lg:grid lg:grid-cols-[1fr_2fr] xl:grid-cols-[380px_1fr] lg:gap-5 space-y-4 lg:space-y-0 relative">
 
       {/* LEFT COLUMN: Filtros + Stats */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {/* Filters */}
-        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
+        <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-2">
           {/* Datas - grid adaptável */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
               <Input 
                 label="Início" 
@@ -2707,7 +2707,7 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
             </div>
           </div>
           {/* Código e Status - grid adaptável */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div>
               <Select 
                 label="Código"
@@ -2725,7 +2725,7 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
               />
             </div>
           </div>
-          <Button variant="outline" className="w-full h-[42px]" onClick={() => setFilters({
+          <Button variant="outline" className="w-full h-[38px] text-sm mt-1" onClick={() => setFilters({
             startDate: getBrasiliaDateString(),
             endDate: getBrasiliaDateString(),
             serviceCode: '',
@@ -2736,12 +2736,14 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <DashboardStatCard label="Total" value={stats.total} icon={<ClipboardList size={18} />} color="bg-slate-900" />
-          <DashboardStatCard label="Concluídas" value={stats.completed} icon={<CheckCircle2 size={18} />} color="bg-blue-500" />
-          <DashboardStatCard label="Em Andamento" value={stats.inProgress} icon={<Clock size={18} />} color="bg-yellow-500" />
-          <DashboardStatCard label="Pausadas" value={stats.paused} icon={<AlertCircle size={18} />} color="bg-orange-500" />
-          <DashboardStatCard label="Canceladas" value={stats.canceled} icon={<XCircle size={18} />} color="bg-red-500" />
+        <div className="flex flex-col gap-3">
+          <DashboardStatCard label="Total de Atividades" value={stats.total} icon={<ClipboardList size={22} />} color="bg-slate-900" />
+          <div className="grid grid-cols-2 gap-3">
+            <DashboardStatCard label="Concluídas" value={stats.completed} icon={<CheckCircle2 size={18} />} color="bg-blue-500" />
+            <DashboardStatCard label="Em Andamento" value={stats.inProgress} icon={<Clock size={18} />} color="bg-yellow-500" />
+            <DashboardStatCard label="Pausadas" value={stats.paused} icon={<AlertCircle size={18} />} color="bg-orange-500" />
+            <DashboardStatCard label="Canceladas" value={stats.canceled} icon={<XCircle size={18} />} color="bg-red-500" />
+          </div>
         </div>
       </div>
 
@@ -2761,52 +2763,46 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
           {isMapFullscreen ? 'Reduzir' : 'Ampliar'}
         </button>
 
-        {/* Fullscreen Stats Overlay */}
+        {/* Fullscreen Stats Overlay (Bottom Glass Pill) */}
         {isMapFullscreen && (
-          <div className="absolute top-4 right-4 z-[2001] w-[calc(100%-32px)] sm:w-64 space-y-3">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl overflow-hidden"
-            >
-              {/* Header */}
-              <div className="px-4 py-3 border-b border-white/20 flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                <span className="text-white text-xs font-bold uppercase tracking-widest drop-shadow">Resumo do Dia</span>
-              </div>
-              {/* Stats */}
-              <div className="divide-y divide-white/10">
-                {[
-                  { label: 'Total de Atividades', value: stats.total, color: '#0F172A', icon: <ClipboardList size={15} /> },
-                  { label: 'Concluídas', value: stats.completed, color: '#3B82F6', icon: <CheckCircle2 size={15} /> },
-                  { label: 'Em Andamento', value: stats.inProgress, color: '#EAB308', icon: <Clock size={15} /> },
-                  { label: 'Pausadas', value: stats.paused, color: '#F97316', icon: <AlertCircle size={15} /> },
-                  { label: 'Canceladas', value: stats.canceled, color: '#EF4444', icon: <XCircle size={15} /> },
-                ].map(s => (
-                  <div key={s.label} className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors">
-                    <div
-                      className="w-8 h-8 rounded-xl flex items-center justify-center text-white shrink-0 shadow"
-                      style={{ backgroundColor: s.color }}
-                    >
-                      {s.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] text-white/70 font-medium leading-none mb-0.5">{s.label}</p>
-                      <p className="text-lg font-black text-white leading-none drop-shadow">{s.value}</p>
-                    </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[2001] w-[calc(100%-32px)] md:w-auto overflow-x-auto pointer-events-none pb-2 hide-scrollbar"
+          >
+            <div className="flex items-center gap-3 sm:gap-4 bg-slate-900/60 backdrop-blur-xl border border-white/20 p-2 sm:p-3 rounded-2xl sm:rounded-full shadow-[0_20px_40px_rgba(0,0,0,0.4)] pointer-events-auto shrink-0 w-max mx-auto">
+              {[
+                  { label: 'Total', value: stats.total, color: '#0F172A', icon: <ClipboardList size={14} /> },
+                  { label: 'Concluídas', value: stats.completed, color: '#3B82F6', icon: <CheckCircle2 size={14} /> },
+                  { label: 'Em Andamento', value: stats.inProgress, color: '#EAB308', icon: <Clock size={14} /> },
+                  { label: 'Pausadas', value: stats.paused, color: '#F97316', icon: <AlertCircle size={14} /> },
+                  { label: 'Canceladas', value: stats.canceled, color: '#EF4444', icon: <XCircle size={14} /> },
+              ].map((s, idx) => (
+                <div key={s.label} className={cn("flex items-center gap-2 px-2 sm:px-3", idx !== 0 && "border-l border-white/10")}>
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white shadow" style={{ backgroundColor: s.color }}>
+                    {s.icon}
                   </div>
-                ))}
-              </div>
-            </motion.div>
+                  <div className="flex flex-col">
+                    <span className="text-[9px] sm:text-[10px] text-white/70 font-semibold uppercase tracking-wider leading-none">{s.label}</span>
+                    <span className="text-sm sm:text-base font-black text-white leading-none mt-1 drop-shadow-sm">{s.value}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
+        {/* Hovered Activity Overlay (Top Right Free Panel) */}
+        {isMapFullscreen && (
+          <div className="absolute top-4 right-4 z-[2001] w-[calc(100%-32px)] sm:w-[320px] pointer-events-none space-y-3">
             <AnimatePresence>
               {hoveredActivity && (
                 <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl overflow-hidden"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="bg-slate-900/60 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.4)] overflow-hidden pointer-events-auto"
                 >
                   {/* Accent bar at top */}
                   <div 
