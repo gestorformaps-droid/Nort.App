@@ -451,9 +451,12 @@ async function setupVite() {
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static(path.join(__dirname, "dist")));
+    // Note: On Vercel, static files are served by the platform, not Express.
+    // This is kept for local production testing.
+    const distPath = path.join(__dirname, "..", "dist");
+    app.use(express.static(distPath));
     app.get("*", (req, res) => {
-      res.sendFile(path.join(__dirname, "dist", "index.html"));
+      res.sendFile(path.join(distPath, "index.html"));
     });
   }
 }
