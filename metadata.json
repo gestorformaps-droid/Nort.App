@@ -1,0 +1,7 @@
+{
+  "name": "nort. Inteligência Operacional",
+  "description": "Sistema corporativo de inteligência operacional com rastreabilidade e validação geográfica de atividades em campo.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
