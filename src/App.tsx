@@ -410,12 +410,10 @@ export default function App() {
   const [error, setError] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1024);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [notifications, setNotifications] = useState<{ id: string, title: string, message: string, type: 'training' | 'chat' | 'occurrence', category: 'personal' | 'manager', date: string, read: boolean, userId?: number, activityId?: number, occurrenceId?: number }[]>([]);
+  const [notifications, setNotifications] = useState<{ id: string, title: string, message: string, type: 'training' | 'occurrence', category: 'personal' | 'manager', date: string, read: boolean, userId?: number, occurrenceId?: number }[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [unreadChats, setUnreadChats] = useState<Record<number, number>>({});
-  const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [viewingEmployeeId, setViewingEmployeeId] = useState<number | null>(null);
-  const [currentToast, setCurrentToast] = useState<{ title: string, message: string, activityId?: number, occurrenceId?: number } | null>(null);
+  const [currentToast, setCurrentToast] = useState<{ title: string, message: string, occurrenceId?: number } | null>(null);
 
   // Data states
   // Data states
@@ -425,72 +423,16 @@ export default function App() {
   const [occurrences, setOccurrences] = useState<Occurrence[]>([]);
 
   // Global Supabase Realtime Subscription
-  const wsStateRef = React.useRef({ activities, selectedChatId, user });
+  const wsStateRef = React.useRef({ activities, user });
   useEffect(() => {
-    wsStateRef.current = { activities, selectedChatId, user };
-  }, [activities, selectedChatId, user]);
+    wsStateRef.current = { activities, user };
+  }, [activities, user]);
 
   useEffect(() => {
     if (!user) return;
 
     const channel = supabase
       .channel('schema-db-changes')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
-        const msg = payload.new as Message & { om_number?: string };
-        const currentActivities = wsStateRef.current.activities;
-        const currentSelectedChatId = wsStateRef.current.selectedChatId;
-        const currentUser = wsStateRef.current.user;
-        if (!currentUser) return;
-
-        // Check if user is involved in this activity
-        const activity = currentActivities.find(a => a.id === msg.activity_id);
-        if (!activity) return;
-
-        const isOwner = activity.user_id === currentUser.id;
-        let isInvolved = false;
-        try {
-          const involved = typeof activity.involved_employees === 'string' 
-            ? JSON.parse(activity.involved_employees) 
-            : activity.involved_employees;
-          isInvolved = Array.isArray(involved) && involved.includes(currentUser.registration);
-        } catch (e) {}
-
-        const canSeeChat = currentUser.role === 'manager' || isOwner || isInvolved;
-
-        if (currentSelectedChatId !== msg.activity_id && canSeeChat) {
-          setUnreadChats(prev => ({
-            ...prev,
-            [msg.activity_id]: (prev[msg.activity_id] || 0) + 1
-          }));
-
-          setCurrentToast({
-            title: `Mensagem de ${msg.user_name}`,
-            message: msg.text.startsWith('[IMAGE]') ? '📷 Imagem enviada' : msg.text.startsWith('[AUDIO]') ? '🎤 Áudio enviado' : msg.text,
-            activityId: msg.activity_id
-          });
-
-          setTimeout(() => setCurrentToast(null), 5000);
-
-          setNotifications(prev => {
-            const id = `chat-${msg.id}`;
-            if (prev.find(n => n.id === id)) return prev;
-            
-            return [
-              {
-                id,
-                title: `Nova mensagem: ${msg.om_number || 'Registro'}`,
-                message: `${msg.user_name}: ${msg.text}`,
-                type: 'chat',
-                category: 'personal',
-                date: format(new Date(), 'HH:mm'),
-                read: false,
-                activityId: msg.activity_id
-              },
-              ...prev
-            ].slice(0, 20);
-          });
-        }
-      })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'occurrences' }, (payload) => {
         const currentUser = wsStateRef.current.user;
         if (!currentUser) return;
@@ -591,36 +533,10 @@ export default function App() {
     localStorage.removeItem('user');
     setUser(null);
     setNotifications([]);
-    setUnreadChats({});
     setView('splash');
   }, []);
 
-  const handleSelectChat = React.useCallback((id: number | null) => {
-    setSelectedChatId(id);
-    if (id) {
-      setUnreadChats(prev => {
-        if (!prev[id]) return prev;
-        const next = { ...prev };
-        delete next[id];
-        return next;
-      });
-    }
-  }, []);
 
-  const filteredActivitiesForChat = useMemo(() => {
-    if (!user) return [];
-    return user.role === 'manager' ? activities : activities.filter(a => {
-      const isOwner = a.user_id === user.id;
-      let isInvolved = false;
-      try {
-        const involved = typeof a.involved_employees === 'string' 
-          ? JSON.parse(a.involved_employees) 
-          : a.involved_employees;
-        isInvolved = Array.isArray(involved) && involved.includes(user.registration);
-      } catch (e) {}
-      return isOwner || isInvolved;
-    });
-  }, [user, activities]);
 
   const fetchData = React.useCallback(async () => {
     try {
@@ -704,8 +620,8 @@ export default function App() {
     }
 
     setNotifications(prev => {
-      // Keep chat and occurrence notifications (they are dynamic)
-      const persistentNotifs = prev.filter(n => n.type === 'chat' || n.type === 'occurrence');
+      // Keep occurrence notifications (they are dynamic)
+      const persistentNotifs = prev.filter(n => n.type === 'occurrence');
       
       // Filter out training notifications that are no longer in allExpiring
       // but keep their "read" status if they still exist
@@ -722,9 +638,6 @@ export default function App() {
   const navigateTo = (tab: string) => {
     setActiveTab(tab);
     setIsMobileMenuOpen(false);
-    if (tab !== 'chats') {
-      setSelectedChatId(null);
-    }
   };
 
   if (view === 'splash') {
@@ -969,7 +882,7 @@ export default function App() {
                               key={n.id}
                               onClick={() => {
                                 setNotifications(prev => prev.map(notif => notif.id === n.id ? { ...notif, read: true } : notif));
-                                if (n.type === 'chat' || n.type === 'occurrence') {
+                                if (n.type === 'occurrence') {
                                   setActiveTab('occurrences');
                                 }
                                 if (n.type === 'training') {
@@ -989,13 +902,9 @@ export default function App() {
                             >
                               <div className={cn(
                                 "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
-                                n.type === 'training' ? "bg-amber-50 text-amber-600" : 
-                                n.type === 'occurrence' ? "bg-red-50 text-red-600" :
-                                "bg-blue-50 text-blue-600"
+                                n.type === 'training' ? "bg-amber-50 text-amber-600" : "bg-red-50 text-red-600"
                               )}>
-                                {n.type === 'training' ? <AlertCircle size={18} /> : 
-                                 n.type === 'occurrence' ? <AlertTriangle size={18} /> :
-                                 <MessageCircle size={18} />}
+                                {n.type === 'training' ? <AlertCircle size={18} /> : <AlertTriangle size={18} />}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs font-bold text-slate-900 mb-0.5">{n.title}</p>
