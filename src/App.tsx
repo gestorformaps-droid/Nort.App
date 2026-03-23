@@ -776,7 +776,7 @@ export default function App() {
             <Logo className="scale-65 shrink-0" />
             <motion.h1 
               animate={{ opacity: (isSidebarOpen || window.innerWidth < 1024) ? 1 : 0 }}
-              className="font-bold text-2xl tracking-tight whitespace-nowrap"
+              className="font-bold text-lg tracking-tight whitespace-nowrap"
             >
               nort.
             </motion.h1>
@@ -913,7 +913,7 @@ export default function App() {
               <Menu size={24} strokeWidth={2.5} />
             </button>
             <div className="min-w-0">
-              <h2 className="text-base lg:text-xl font-bold text-white leading-tight truncate">
+              <h2 className="text-base lg:text-lg font-bold text-white leading-tight truncate">
                 {activeTab === 'profile' && (user?.role === 'manager' ? 'Painel do Gestor' : 'Painel Funcionário')}
                 {activeTab === 'new' && 'Novo Registro'}
                 {activeTab === 'list' && 'Lista de Registros'}
@@ -1242,10 +1242,10 @@ function LandingPage({ onLogin }: { onLogin: () => void }) {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="space-y-1"
         >
-          <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tighter leading-none">
+          <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-tighter leading-none">
             nort.
           </h1>
-          <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
             inteligência<br />
             de <span className="text-[#3B82F6]">campo.</span>
           </h2>
@@ -1360,7 +1360,7 @@ function AuthPage({ view, setView, setUser }: { view: 'login' | 'register', setV
             <div className="flex justify-center mb-2">
               <Logo className="scale-90" />
             </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">nort.</h1>
+            <h1 className="text-lg font-bold text-white tracking-tight">nort.</h1>
             <p className="text-blue-400/60 text-xs font-medium mt-1">Inteligência Operacional</p>
           </div>
 
@@ -1768,7 +1768,7 @@ function ProfileView({ user, onUpdate, onUserUpdate, canToggleStatus = true, rea
               onDelete={user.avatar_url ? handleRemoveAvatar : undefined}
             />
           )}
-          <h3 className="text-xl lg:text-2xl font-bold text-slate-900">{user.name}</h3>
+          <h3 className="text-lg lg:text-lg font-bold text-slate-900">{user.name}</h3>
           <p className="text-slate-500 text-xs lg:text-sm">Matrícula: {user.registration}</p>
           <div className="mt-4 inline-flex px-3 py-1 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-full uppercase tracking-wider">
             {user.function || (user.role === 'employee' ? 'Funcionário' : 'Gestor')}
@@ -2940,7 +2940,7 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[11px] text-white/70 font-medium leading-none mb-0.5">{s.label}</p>
-                      <p className="text-xl font-black text-white leading-none drop-shadow">{s.value}</p>
+                      <p className="text-lg font-black text-white leading-none drop-shadow">{s.value}</p>
                     </div>
                   </div>
                 ))}
@@ -3229,14 +3229,14 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
                         <Clock size={14} className="text-blue-600" />
                         <p className="text-[10px] font-bold text-blue-600 uppercase">Tempo Ativo</p>
                       </div>
-                      <p className="text-xl font-bold text-blue-700">{selectedActivity.total_active_time || 0} <span className="text-xs font-medium">min</span></p>
+                      <p className="text-lg font-bold text-blue-700">{selectedActivity.total_active_time || 0} <span className="text-xs font-medium">min</span></p>
                     </div>
                     <div className="bg-orange-50 p-4 rounded-xl border border-orange-100">
                       <div className="flex items-center gap-2 mb-1">
                         <AlertCircle size={14} className="text-orange-600" />
                         <p className="text-[10px] font-bold text-orange-600 uppercase">Tempo Parado</p>
                       </div>
-                      <p className="text-xl font-bold text-orange-700">{selectedActivity.total_paused_time || 0} <span className="text-xs font-medium">min</span></p>
+                      <p className="text-lg font-bold text-orange-700">{selectedActivity.total_paused_time || 0} <span className="text-xs font-medium">min</span></p>
                     </div>
                   </div>
                 </section>
@@ -3563,7 +3563,7 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
                 </RechartsPieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <p className="text-2xl font-bold text-slate-900">{totalActivities}</p>
+                <p className="text-lg font-bold text-slate-900">{totalActivities}</p>
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total</p>
               </div>
             </div>
@@ -3636,14 +3636,14 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
                       <Clock size={16} className="text-blue-600" />
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tempo Ativo</p>
                     </div>
-                    <p className="text-2xl font-bold text-slate-900">{selectedActivity.total_active_time || 0} <span className="text-xs font-medium text-slate-500">min</span></p>
+                    <p className="text-lg font-bold text-slate-900">{selectedActivity.total_active_time || 0} <span className="text-xs font-medium text-slate-500">min</span></p>
                   </div>
                   <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
                     <div className="flex items-center gap-2 mb-2">
                       <AlertCircle size={16} className="text-orange-500" />
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tempo Parado</p>
                     </div>
-                    <p className="text-2xl font-bold text-slate-900">{selectedActivity.total_paused_time || 0} <span className="text-xs font-medium text-slate-500">min</span></p>
+                    <p className="text-lg font-bold text-slate-900">{selectedActivity.total_paused_time || 0} <span className="text-xs font-medium text-slate-500">min</span></p>
                   </div>
                 </div>
                 {/* General Info */}
@@ -4333,7 +4333,7 @@ function DashboardStatCard({ label, value, icon, color }: { label: string, value
       <div className={cn("w-7 h-7 lg:w-10 lg:h-10 rounded-xl flex items-center justify-center text-white", color)}>
         {React.cloneElement(icon as React.ReactElement, { size: 16 })}
       </div>
-      <p className="absolute top-3 right-3 lg:top-4 lg:right-4 text-xl lg:text-3xl font-bold text-slate-900">{value}</p>
+      <p className="absolute top-3 right-3 lg:top-4 lg:right-4 text-lg lg:text-2xl font-bold text-slate-900">{value}</p>
       <p className="text-[9px] lg:text-xs font-bold text-slate-500 uppercase tracking-wider truncate mt-2">{label}</p>
     </div>
   );
@@ -4581,7 +4581,7 @@ function DashboardsView({ activities, occurrences, employees }: { activities: Ac
               </div>
               <span className={`text-xs font-bold ${card.trendColor}`}>{card.trend}</span>
             </div>
-            <p className="text-2xl lg:text-3xl font-black text-slate-900 tracking-tight">{card.value}</p>
+            <p className="text-lg lg:text-2xl font-black text-slate-900 tracking-tight">{card.value}</p>
             <p className="text-sm font-semibold text-slate-600 mt-0.5">{card.label}</p>
             <p className="text-xs text-slate-400 mt-1">{card.sub}</p>
           </div>
@@ -4650,7 +4650,7 @@ function DashboardsView({ activities, occurrences, employees }: { activities: Ac
               </RechartsPieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-              <p className="text-2xl font-black text-slate-900">{totalActivities}</p>
+              <p className="text-lg font-black text-slate-900">{totalActivities}</p>
               <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Total</p>
             </div>
           </div>
@@ -4717,7 +4717,7 @@ function DashboardsView({ activities, occurrences, employees }: { activities: Ac
                 </RechartsPieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <p className="text-xl font-black text-slate-900">{totalOccurrences}</p>
+                <p className="text-lg font-black text-slate-900">{totalOccurrences}</p>
                 <p className="text-[9px] text-slate-400 font-medium uppercase tracking-wider">Total</p>
               </div>
             </div>
