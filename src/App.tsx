@@ -405,7 +405,13 @@ const Select = ({ label, options, error, ...props }: React.SelectHTMLAttributes<
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [view, setView] = useState<'login' | 'register' | 'dashboard'>('login');
-  const [activeTab, setActiveTab] = useState<'profile' | 'new' | 'list' | 'manager' | 'manager_records' | 'manager_employees' | 'occurrences'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'new' | 'list' | 'manager' | 'manager_records' | 'manager_employees' | 'occurrences'>(() => {
+    return (localStorage.getItem('activeTab') as any) || 'profile';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('activeTab', activeTab);
+  }, [activeTab]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1024);
@@ -477,15 +483,32 @@ export default function App() {
         }
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'activities' }, (payload) => {
+        const currentUser = wsStateRef.current.user;
         if (payload.eventType === 'INSERT') {
           const act = payload.new as Activity;
           setActivities(prev => {
             if (prev.find(a => a.id === act.id)) return prev;
             return [act, ...prev];
           });
+          
+          if (currentUser && currentUser.role === 'manager') {
+            setCurrentToast({
+              title: `Novo Registro Adicionado`,
+              message: `${act.operation || 'Nova Operação'} (OM: ${act.om_number || 'S/N'})`
+            });
+            setTimeout(() => setCurrentToast(null), 5000);
+          }
         } else if (payload.eventType === 'UPDATE') {
           const act = payload.new as Activity;
           setActivities(prev => prev.map(a => a.id === act.id ? act : a));
+          
+          if (currentUser && currentUser.role === 'manager') {
+            setCurrentToast({
+              title: `Status de Registro Atualizado`,
+              message: `A OM ${act.om_number} foi para ${act.status}.`
+            });
+            setTimeout(() => setCurrentToast(null), 5000);
+          }
         }
       })
       .subscribe();
@@ -518,7 +541,13 @@ export default function App() {
       const parsedUser = JSON.parse(savedUser);
       setUser(parsedUser);
       setView('dashboard');
-      setActiveTab(parsedUser.role === 'manager' ? 'manager' : 'profile');
+      
+      const savedTab = localStorage.getItem('activeTab') as any;
+      if (savedTab) {
+        setActiveTab(savedTab);
+      } else {
+        setActiveTab(parsedUser.role === 'manager' ? 'manager' : 'profile');
+      }
     }
   }, []);
 
