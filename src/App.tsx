@@ -1816,20 +1816,28 @@ function DashboardNewRecordView({ user, locations, employees, onSuccess }: { use
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [currentPos, setCurrentPos] = useState<{ latitude: number, longitude: number } | null>(null);
+  const [currentPos, setCurrentPos] = useState<{ latitude: number, longitude: number, accuracy: number } | null>(null);
 
   useEffect(() => {
     let watchId: number;
     if (navigator.geolocation) {
       watchId = navigator.geolocation.watchPosition(
         (position) => {
-          setCurrentPos({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
+          const acc = position.coords.accuracy;
+          setCurrentPos(prev => {
+            // Só atualiza se for o primeiro ping OU se o novo ping tiver raio de precisão menor/igual
+            if (!prev || acc <= prev.accuracy) {
+              return {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+                accuracy: acc
+              };
+            }
+            return prev;
           });
         },
         (err) => console.log('Radar GPS error:', err),
-        { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 }
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 }
       );
     }
     return () => {
