@@ -40,7 +40,8 @@ import {
   Mic,
   Download,
   Maximize2,
-  Minimize2
+  Minimize2,
+  RefreshCw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -369,7 +370,7 @@ const Input = ({ label, error, icon: Icon, ...props }: React.InputHTMLAttributes
       )}
       <input 
         className={cn(
-          "w-full px-3 py-1.5 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all",
+          "w-full px-3 py-1.5 text-base md:text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all",
           Icon && "pl-10",
           error && "border-red-500 focus:ring-red-500/10 focus:border-red-500"
         )}
@@ -385,7 +386,7 @@ const Select = ({ label, options, error, ...props }: React.SelectHTMLAttributes<
     {label && <label className="text-sm font-medium text-slate-700">{label}</label>}
     <select 
       className={cn(
-        "w-full px-3 py-1.5 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all appearance-none",
+        "w-full px-3 py-1.5 text-base md:text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all appearance-none",
         error && "border-red-500 focus:ring-red-500/10 focus:border-red-500"
       )}
       {...props}
@@ -511,7 +512,12 @@ export default function App() {
           }
         }
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log(`Supabase Realtime status:`, status);
+        if (status === 'CHANNEL_ERROR') {
+          console.warn('Realtime channel error. Data might not update automatically.');
+        }
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -556,18 +562,15 @@ export default function App() {
     if (user) {
       fetchData();
     }
-  }, [user]);
+  }, [user, activeTab]);
 
   const handleLogout = React.useCallback(() => {
     localStorage.removeItem('user');
     setUser(null);
     setNotifications([]);
     setView('login');
-  }, []);
-
-
-
-  const fetchData = React.useCallback(async () => {
+  }, []);  const fetchData = React.useCallback(async () => {
+    setLoading(true);
     try {
       const [actRes, locRes, empRes, occRes] = await Promise.all([
         fetch('/api/activities'),
@@ -593,6 +596,10 @@ export default function App() {
       setOccurrences(occData);
     } catch (err) {
       console.error("Error fetching data:", err);
+      setError('Erro ao sincronizar dados. Tente novamente.');
+      setTimeout(() => setError(''), 3000);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -860,6 +867,18 @@ export default function App() {
           </div>
           <div className="flex items-center gap-4">
             <div className="relative">
+              <button 
+                onClick={() => fetchData()}
+                disabled={loading}
+                className={cn(
+                  "p-2.5 text-white/60 hover:bg-white/5 rounded-lg transition-all",
+                  loading && "opacity-50 cursor-not-allowed"
+                )}
+                title="Sincronizar Dados"
+              >
+                <RefreshCw size={20} className={cn(loading && "animate-spin")} />
+              </button>
+
               <button 
                 onClick={() => setShowNotifications(!showNotifications)}
                 className="p-2.5 text-white/60 hover:bg-white/5 rounded-lg relative"
@@ -1244,7 +1263,7 @@ function AuthPage({ view, setView, setUser }: { view: 'login' | 'register', setV
                     <select 
                       value={formData.role}
                       onChange={e => setFormData({...formData, role: e.target.value as any})}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-10 text-white appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all text-sm"
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-10 text-white appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all text-base md:text-sm"
                     >
                       <option value="employee" className="bg-[#00153D]">Perfil: Funcionário</option>
                       <option value="manager" className="bg-[#00153D]">Perfil: Gestor</option>
@@ -1368,7 +1387,7 @@ function AuthInput({ icon: Icon, ...props }: React.InputHTMLAttributes<HTMLInput
       </div>
       <input 
         {...props}
-        className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all"
+        className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all text-base md:text-sm"
       />
     </div>
   );
@@ -2092,7 +2111,7 @@ function DashboardNewRecordView({ user, locations, employees, onSuccess }: { use
               );
             })}
             <input 
-              className="flex-1 outline-none min-w-[100px] text-xs lg:text-sm"
+              className="flex-1 outline-none min-w-[100px] text-base lg:text-sm"
               placeholder="Adicionar colegas..."
               value={searchEmp}
               onChange={e => {
@@ -2140,7 +2159,7 @@ function DashboardNewRecordView({ user, locations, employees, onSuccess }: { use
               <MapPin size={18} />
             </div>
             <input 
-              className="w-full pl-10 pr-8 py-1.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all text-sm"
+              className="w-full pl-10 pr-8 py-1.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all text-base lg:text-sm"
               placeholder="Buscar local..."
               value={searchLoc}
               onChange={e => {
@@ -2226,7 +2245,7 @@ function DashboardNewRecordView({ user, locations, employees, onSuccess }: { use
       <div className="space-y-1.5">
         <label className="text-sm font-medium text-slate-700">Descrição</label>
         <textarea 
-          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all min-h-[60px] text-sm"
+          className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all min-h-[60px] text-base lg:text-sm"
           placeholder="Descreva a atividade..."
           required
           value={formData.description}
@@ -4344,7 +4363,7 @@ function DashboardsView({ activities, occurrences, employees }: { activities: Ac
         <select
           value={filterEmployee}
           onChange={e => setFilterEmployee(e.target.value)}
-          className="px-3 py-2 bg-slate-50 border-0 rounded-xl text-xs font-semibold text-slate-600 focus:ring-2 focus:ring-blue-500/20 outline-none cursor-pointer"
+          className="px-3 py-2 bg-slate-50 border-0 rounded-xl text-base md:text-xs font-semibold text-slate-600 focus:ring-2 focus:ring-blue-500/20 outline-none cursor-pointer"
         >
           {employeeNames.map(n => <option key={n}>{n}</option>)}
         </select>
@@ -4353,7 +4372,7 @@ function DashboardsView({ activities, occurrences, employees }: { activities: Ac
         <select
           value={filterOccType}
           onChange={e => setFilterOccType(e.target.value)}
-          className="px-3 py-2 bg-slate-50 border-0 rounded-xl text-xs font-semibold text-slate-600 focus:ring-2 focus:ring-blue-500/20 outline-none cursor-pointer"
+          className="px-3 py-2 bg-slate-50 border-0 rounded-xl text-base md:text-xs font-semibold text-slate-600 focus:ring-2 focus:ring-blue-500/20 outline-none cursor-pointer"
         >
           {['Todos', 'Segurança', 'Operacional', 'Ambiental', 'Outros'].map(t => <option key={t}>{t}</option>)}
         </select>
