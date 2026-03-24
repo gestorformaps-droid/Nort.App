@@ -955,7 +955,12 @@ export default function App() {
           </div>
         </header>
 
-        <div className="p-2 sm:p-3 lg:p-6 max-w-[1440px] mx-auto w-full flex-1 flex flex-col min-h-0 no-scrollbar overflow-y-auto">
+        <div className={cn(
+          "flex-1 flex flex-col min-h-0 w-full max-w-[1440px] mx-auto",
+          activeTab === 'manager'
+            ? "overflow-hidden p-2 sm:p-3 lg:p-5"
+            : "overflow-y-auto p-2 sm:p-3 lg:p-6 no-scrollbar"
+        )}>
           <AnimatePresence mode="wait">
             {activeTab === 'profile' && (
               <motion.div 
@@ -1020,6 +1025,7 @@ export default function App() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
+                className="h-full flex flex-col"
               >
                 <ManagerDashboard 
                   activities={activities} 
@@ -2681,10 +2687,10 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
   }), [filteredActivities]);
 
   return (
-    <div className="lg:grid lg:grid-cols-[1fr_2fr] xl:grid-cols-[380px_1fr] lg:gap-5 space-y-4 lg:space-y-0 relative">
+    <div className="lg:grid lg:grid-cols-[1fr_2fr] xl:grid-cols-[340px_1fr] lg:gap-4 flex flex-col gap-3 h-full min-h-0">
 
       {/* LEFT COLUMN: Filtros + Stats */}
-      <div className="space-y-3">
+      <div className="flex flex-col gap-2 lg:overflow-y-auto lg:no-scrollbar min-h-0">
         {/* Filters */}
         <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-2">
           {/* Datas - grid adaptável */}
@@ -2749,10 +2755,10 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
 
       {/* RIGHT COLUMN: Map */}
       <div className={cn(
-        "bg-white p-2 lg:p-3 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden transition-all duration-300",
+        "bg-white p-1.5 lg:p-2 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden transition-all duration-300 min-h-0",
         isMapFullscreen
           ? "fixed inset-0 z-[2000] rounded-none border-0 p-0"
-          : "h-[400px] sm:h-[500px] lg:h-auto lg:min-h-[540px]"
+          : "flex-1 lg:h-auto"
       )}>
         {/* Expand / Collapse Button */}
         <button
