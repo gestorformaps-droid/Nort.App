@@ -2769,30 +2769,28 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
           {isMapFullscreen ? 'Reduzir' : 'Ampliar'}
         </button>
 
-        {/* Fullscreen Stats Overlay (Bottom Glass Pill) */}
+        {/* Fullscreen Stats Overlay (Top Right Glass Pill) */}
         {isMapFullscreen && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[2001] w-[calc(100%-32px)] md:w-auto overflow-x-auto pointer-events-none pb-2 hide-scrollbar"
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute top-14 right-4 z-[2001]"
           >
-            <div className="flex items-center gap-3 sm:gap-4 bg-slate-900/60 backdrop-blur-xl border border-white/20 p-2 sm:p-3 rounded-2xl sm:rounded-full shadow-[0_20px_40px_rgba(0,0,0,0.4)] pointer-events-auto shrink-0 w-max mx-auto">
+            <div className="flex flex-col gap-1.5 bg-slate-900/60 backdrop-blur-xl border border-white/20 p-2 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.4)]">
               {[
-                  { label: 'Total', value: stats.total, color: '#0F172A', icon: <ClipboardList size={14} /> },
-                  { label: 'Concluídas', value: stats.completed, color: '#3B82F6', icon: <CheckCircle2 size={14} /> },
-                  { label: 'Em Andamento', value: stats.inProgress, color: '#EAB308', icon: <Clock size={14} /> },
-                  { label: 'Pausadas', value: stats.paused, color: '#F97316', icon: <AlertCircle size={14} /> },
-                  { label: 'Canceladas', value: stats.canceled, color: '#EF4444', icon: <XCircle size={14} /> },
-              ].map((s, idx) => (
-                <div key={s.label} className={cn("flex items-center gap-2 px-2 sm:px-3", idx !== 0 && "border-l border-white/10")}>
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white shadow" style={{ backgroundColor: s.color }}>
+                  { label: 'Total', value: stats.total, color: '#0F172A', icon: <ClipboardList size={12} /> },
+                  { label: 'Concluídas', value: stats.completed, color: '#3B82F6', icon: <CheckCircle2 size={12} /> },
+                  { label: 'Em Andamento', value: stats.inProgress, color: '#EAB308', icon: <Clock size={12} /> },
+                  { label: 'Pausadas', value: stats.paused, color: '#F97316', icon: <AlertCircle size={12} /> },
+                  { label: 'Canceladas', value: stats.canceled, color: '#EF4444', icon: <XCircle size={12} /> },
+              ].map((s) => (
+                <div key={s.label} className="flex items-center gap-2 px-1.5 py-1">
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center text-white shadow shrink-0" style={{ backgroundColor: s.color }}>
                     {s.icon}
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] sm:text-[10px] text-white/70 font-semibold uppercase tracking-wider leading-none">{s.label}</span>
-                    <span className="text-sm sm:text-base font-black text-white leading-none mt-1 drop-shadow-sm">{s.value}</span>
-                  </div>
+                  <span className="text-[10px] text-white/80 font-semibold w-20 leading-none">{s.label}</span>
+                  <span className="text-sm font-black text-white leading-none drop-shadow-sm min-w-[16px] text-right">{s.value}</span>
                 </div>
               ))}
             </div>
