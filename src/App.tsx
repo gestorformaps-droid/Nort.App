@@ -556,23 +556,7 @@ export default function App() {
     }
   }, []);
 
-  // Fetch data on manual mount and tab switch (but avoid redundant calls)
-  const lastTabRef = React.useRef(activeTab);
-  useEffect(() => {
-    if (user && activeTab !== lastTabRef.current) {
-      fetchData();
-      lastTabRef.current = activeTab;
-    } else if (user && !activities.length) {
-      fetchData();
-    }
-  }, [user, activeTab, activities.length]);
-
-  const handleLogout = React.useCallback(() => {
-    localStorage.removeItem('user');
-    setUser(null);
-    setNotifications([]);
-    setView('login');
-  }, []);  const fetchData = React.useCallback(async () => {
+  const fetchData = React.useCallback(async () => {
     setLoading(true);
     try {
       const [actRes, locRes, empRes, occRes] = await Promise.all([
@@ -604,6 +588,37 @@ export default function App() {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  // Fetch data on manual mount and tab switch (but avoid redundant calls)
+  const lastTabRef = React.useRef(activeTab);
+  useEffect(() => {
+    if (user && activeTab !== lastTabRef.current) {
+      fetchData();
+      lastTabRef.current = activeTab;
+    } else if (user && !activities.length) {
+      fetchData();
+    }
+  }, [user, activeTab, activities.length]);
+
+  // Auto-refresh for Map Tab (every 30 seconds)
+  useEffect(() => {
+    if (!user || activeTab !== 'manager') return;
+    
+    const interval = setInterval(() => {
+      fetchData();
+    }, 30000);
+    
+    return () => clearInterval(interval);
+  }, [user, activeTab, fetchData]);
+
+
+
+  const handleLogout = React.useCallback(() => {
+    localStorage.removeItem('user');
+    setUser(null);
+    setNotifications([]);
+    setView('login');
   }, []);
 
   // Check for expiring trainings
