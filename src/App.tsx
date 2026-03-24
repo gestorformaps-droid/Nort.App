@@ -838,7 +838,7 @@ export default function App() {
           )}
         </AnimatePresence>
 
-        <header className="bg-[#00153D] border-b border-white/5 px-4 lg:px-8 py-3 lg:py-4 flex items-center justify-between sticky top-0 z-[1005] shadow-lg lg:shadow-none">
+        <header className="bg-[#00153D] border-b border-white/5 px-4 lg:px-8 py-2 lg:py-2.5 flex items-center justify-between sticky top-0 z-[1005] shadow-lg lg:shadow-none">
           <div className="flex items-center gap-3 overflow-hidden">
             <button 
               onClick={() => setIsMobileMenuOpen(true)}
