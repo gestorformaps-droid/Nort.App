@@ -3305,25 +3305,31 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
             type="date" 
             value={filters.startDate}
             onChange={e => setFilters({...filters, startDate: e.target.value})}
+            className="text-xs"
           />
           <Input 
             label="Fim" 
             type="date" 
             value={filters.endDate}
             onChange={e => setFilters({...filters, endDate: e.target.value})}
+            className="text-xs"
           />
-          <Select 
-            label="Código do Serviço"
-            options={OM_CODES.map(c => ({ value: c, label: c }))}
-            value={filters.serviceCode}
-            onChange={e => setFilters({...filters, serviceCode: e.target.value})}
-          />
-          <Select 
-            label="Status"
-            options={ACTIVITY_STATUSES.map(s => ({ value: s, label: s }))}
-            value={filters.status}
-            onChange={e => setFilters({...filters, status: e.target.value})}
-          />
+          <div className="col-span-1">
+            <Select 
+              label="Código"
+              options={OM_CODES.map(c => ({ value: c, label: c }))}
+              value={filters.serviceCode}
+              onChange={e => setFilters({...filters, serviceCode: e.target.value})}
+            />
+          </div>
+          <div className="col-span-1">
+            <Select 
+              label="Status"
+              options={ACTIVITY_STATUSES.map(s => ({ value: s, label: s }))}
+              value={filters.status}
+              onChange={e => setFilters({...filters, status: e.target.value})}
+            />
+          </div>
         </div>
         <Button variant="outline" className="w-full h-[38px] text-sm" onClick={() => setFilters({
           startDate: getBrasiliaDateString(),
@@ -3967,26 +3973,32 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
             className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm"
           />
         </div>
-        <div className="grid grid-cols-2 gap-2">
-          <select 
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm truncate"
-          >
-            <option value="Todas">Todas</option>
-            <option value="Segurança">Segurança</option>
-            <option value="Operacional">Operacional</option>
-            <option value="Ambiental">Ambiental</option>
-            <option value="Outros">Outros</option>
-          </select>
-          <div className="relative">
-            <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
-            <input 
-              type="date"
-              value={filterDate}
-              onChange={(e) => setFilterDate(e.target.value)}
-              className="w-full pl-8 pr-1 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px]"
-            />
+        <div className="flex gap-2">
+          <div className="flex-[0.8] min-w-0 space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Categoria</label>
+            <select 
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm truncate"
+            >
+              <option value="Todas">Todas</option>
+              <option value="Segurança">Segurança</option>
+              <option value="Operacional">Operacional</option>
+              <option value="Ambiental">Ambiental</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+          <div className="flex-[1.2] min-w-0 space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Data</label>
+            <div className="relative">
+              <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
+              <input 
+                type="date"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+                className="w-full pl-8 pr-1 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px]"
+              />
+            </div>
           </div>
         </div>
       </div>
