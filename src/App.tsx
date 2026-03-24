@@ -280,9 +280,7 @@ const formatPhone = (value: string) => {
   }
   return result;
 };
-
 const getBrasiliaDate = () => {
-  const now = new Date();
   const formatter = new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/Sao_Paulo',
     year: 'numeric',
@@ -293,15 +291,16 @@ const getBrasiliaDate = () => {
     second: 'numeric',
     hour12: false
   });
-  const parts = formatter.formatToParts(now);
-  const map = new Map(parts.map(p => [p.type, p.value]));
+  const parts = formatter.formatToParts(new Date());
+  const mapArr = parts.map(p => [p.type, p.value] as [string, string]);
+  const map = new Map<string, string>(mapArr);
   return new Date(
-    parseInt(map.get('year')!),
-    parseInt(map.get('month')!) - 1,
-    parseInt(map.get('day')!),
-    parseInt(map.get('hour')!),
-    parseInt(map.get('minute')!),
-    parseInt(map.get('second')!)
+    parseInt(map.get('year') || '0'),
+    parseInt(map.get('month') || '1') - 1,
+    parseInt(map.get('day') || '1'),
+    parseInt(map.get('hour') || '0'),
+    parseInt(map.get('minute') || '0'),
+    parseInt(map.get('second') || '0')
   );
 };
 
@@ -557,12 +556,16 @@ export default function App() {
     }
   }, []);
 
-  // Fetch data
+  // Fetch data on manual mount and tab switch (but avoid redundant calls)
+  const lastTabRef = React.useRef(activeTab);
   useEffect(() => {
-    if (user) {
+    if (user && activeTab !== lastTabRef.current) {
+      fetchData();
+      lastTabRef.current = activeTab;
+    } else if (user && !activities.length) {
       fetchData();
     }
-  }, [user, activeTab]);
+  }, [user, activeTab, activities.length]);
 
   const handleLogout = React.useCallback(() => {
     localStorage.removeItem('user');
@@ -3299,7 +3302,7 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
     <div className="space-y-4 lg:space-y-8">
       {/* Filters */}
       <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
           <Input 
             label="Início" 
             type="date" 
@@ -3314,22 +3317,18 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
             onChange={e => setFilters({...filters, endDate: e.target.value})}
             className="text-xs"
           />
-          <div className="col-span-1">
-            <Select 
-              label="Código"
-              options={OM_CODES.map(c => ({ value: c, label: c }))}
-              value={filters.serviceCode}
-              onChange={e => setFilters({...filters, serviceCode: e.target.value})}
-            />
-          </div>
-          <div className="col-span-1">
-            <Select 
-              label="Status"
-              options={ACTIVITY_STATUSES.map(s => ({ value: s, label: s }))}
-              value={filters.status}
-              onChange={e => setFilters({...filters, status: e.target.value})}
-            />
-          </div>
+          <Select 
+            label="Código"
+            options={OM_CODES.map(c => ({ value: c, label: c }))}
+            value={filters.serviceCode}
+            onChange={e => setFilters({...filters, serviceCode: e.target.value})}
+          />
+          <Select 
+            label="Status"
+            options={ACTIVITY_STATUSES.map(s => ({ value: s, label: s }))}
+            value={filters.status}
+            onChange={e => setFilters({...filters, status: e.target.value})}
+          />
         </div>
         <Button variant="outline" className="w-full h-[38px] text-sm" onClick={() => setFilters({
           startDate: getBrasiliaDateString(),
@@ -3973,13 +3972,13 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
             className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm"
           />
         </div>
-        <div className="flex gap-2">
-          <div className="flex-[0.8] min-w-0 space-y-1">
+        <div className="grid grid-cols-2 gap-3 mb-2">
+          <div className="space-y-1">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Categoria</label>
             <select 
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm truncate"
+              className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm truncate h-[42px]"
             >
               <option value="Todas">Todas</option>
               <option value="Segurança">Segurança</option>
@@ -3988,7 +3987,7 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
               <option value="Outros">Outros</option>
             </select>
           </div>
-          <div className="flex-[1.2] min-w-0 space-y-1">
+          <div className="space-y-1">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Data</label>
             <div className="relative">
               <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />

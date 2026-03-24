@@ -23,9 +23,15 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // Helper to get Brasília time in ISO format
 const getBrasiliaISO = () => {
   const date = new Date();
-  const utcDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
-  const brasiliaDate = new Date(utcDate.getTime() - (3 * 3600000));
-  return brasiliaDate.toISOString().replace('Z', '-03:00');
+  return new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  }).format(date).replace(' ', 'T') + '-03:00';
 };
 
 // Helper to safely parse JSON (Supabase JSONB comes pre-parsed)
