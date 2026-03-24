@@ -2735,10 +2735,10 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
           </Button>
         </div>
 
-        {/* Stats Grid */}
-        <div className="flex flex-col gap-3">
+        {/* Stats */}
+        <div className="flex flex-col gap-2">
           <DashboardStatCard label="Total de Atividades" value={stats.total} icon={<ClipboardList size={22} />} color="bg-slate-900" />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2">
             <DashboardStatCard label="Concluídas" value={stats.completed} icon={<CheckCircle2 size={18} />} color="bg-blue-500" />
             <DashboardStatCard label="Em Andamento" value={stats.inProgress} icon={<Clock size={18} />} color="bg-yellow-500" />
             <DashboardStatCard label="Pausadas" value={stats.paused} icon={<AlertCircle size={18} />} color="bg-orange-500" />
@@ -4178,12 +4178,14 @@ function DashboardAddOccurrenceModal({ onClose, onSave, loading, initialLocation
 
 function DashboardStatCard({ label, value, icon, color }: { label: string, value: number, icon: React.ReactNode, color: string }) {
   return (
-    <div className="bg-white p-3 lg:p-4 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden min-h-[80px] sm:min-h-[90px] lg:min-h-[110px] flex flex-col justify-between">
-      <div className={cn("w-7 h-7 lg:w-10 lg:h-10 rounded-xl flex items-center justify-center text-white", color)}>
-        {React.cloneElement(icon as React.ReactElement, { size: 16 })}
+    <div className="bg-white px-3 py-2.5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-3">
+      <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center text-white shrink-0", color)}>
+        {React.cloneElement(icon as React.ReactElement, { size: 15 })}
       </div>
-      <p className="absolute top-3 right-3 lg:top-4 lg:right-4 text-lg lg:text-2xl font-bold text-slate-900">{value}</p>
-      <p className="text-[9px] lg:text-xs font-bold text-slate-500 uppercase tracking-wider truncate mt-2">{label}</p>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-none">{label}</p>
+        <p className="text-xl font-bold text-slate-900 leading-tight mt-0.5">{value}</p>
+      </div>
     </div>
   );
 }
