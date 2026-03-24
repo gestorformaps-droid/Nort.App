@@ -3280,16 +3280,6 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
 
   return (
     <div className="space-y-4 lg:space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h3 className="text-base lg:text-lg font-bold text-slate-900">Listagem de Registros</h3>
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Button onClick={exportToExcel} variant="secondary" className="flex-1 sm:flex-none py-2.5">
-            <ClipboardList size={18} />
-            Excel
-          </Button>
-        </div>
-      </div>
-
       {/* Filters */}
       <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap gap-3 lg:gap-4 items-end">
         <div className="w-full sm:flex-1 min-w-[140px]">
