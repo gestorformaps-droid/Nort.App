@@ -53,6 +53,9 @@ app.use(express.json());
 // Auth Endpoints
 app.post("/api/auth/login", async (req, res) => {
   const { registration, password } = req.body;
+  if (registration?.length !== 6 || password?.length !== 8) {
+    return res.status(400).json({ error: "Matrícula deve ter 6 dígitos e Senha deve ter 8 dígitos" });
+  }
   const { data: user, error } = await supabase
     .from("users")
     .select("*")
@@ -77,6 +80,10 @@ app.post("/api/auth/login", async (req, res) => {
 
 app.post("/api/auth/register", async (req, res) => {
   const { name, registration, password, role, function: userFunction, email, phone, trainings, avatar_url } = req.body;
+  
+  if (registration?.length !== 6 || password?.length !== 8) {
+    return res.status(400).json({ error: "Matrícula deve ter 6 dígitos e Senha deve ter 8 dígitos" });
+  }
   
   const { data: newUser, error } = await supabase
     .from("users")

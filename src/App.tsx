@@ -546,6 +546,11 @@ export default function App() {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
       const parsedUser = JSON.parse(savedUser);
+      if (parsedUser.role === 'manager' && !parsedUser.is_active) {
+        localStorage.removeItem('user');
+        setIsPendingApproval(true);
+        return;
+      }
       setUser(parsedUser);
       setView('dashboard');
       
@@ -732,6 +737,10 @@ export default function App() {
 
   if (view === 'login' || view === 'register') {
     return <AuthPage view={view} setView={setView} setIsPendingApproval={setIsPendingApproval} setUser={(u) => {
+      if (u.role === 'manager' && !u.is_active) {
+        setIsPendingApproval(true);
+        return;
+      }
       setUser(u);
       setIsPendingApproval(false); // Clear if user was pending but now cleared
       setView('dashboard');
@@ -1211,6 +1220,16 @@ function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'log
     
     if (view === 'register' && formData.password !== formData.confirmPassword) {
       setError('As senhas não coincidem');
+      return;
+    }
+
+    if (formData.registration.length !== 6) {
+      setError('A matrícula deve ter exatamente 6 dígitos');
+      return;
+    }
+
+    if (formData.password.length !== 8) {
+      setError('A senha deve ter exatamente 8 dígitos');
       return;
     }
 
