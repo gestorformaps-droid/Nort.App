@@ -414,26 +414,7 @@ export default function App() {
   }, [activeTab]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [currentPos, setCurrentPos] = useState<{ latitude: number, longitude: number } | null>(null);
 
-  useEffect(() => {
-    let watchId: number;
-    if (navigator.geolocation) {
-      watchId = navigator.geolocation.watchPosition(
-        (position) => {
-          setCurrentPos({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          });
-        },
-        (err) => console.log('Radar GPS error:', err),
-        { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 }
-      );
-    }
-    return () => {
-      if (watchId) navigator.geolocation.clearWatch(watchId);
-    };
-  }, []);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1024);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState<{ id: string, title: string, message: string, type: 'training' | 'occurrence', category: 'personal' | 'manager', date: string, read: boolean, userId?: number, occurrenceId?: number }[]>([]);
@@ -1312,10 +1293,11 @@ function AuthPage({ view, setView, setUser }: { view: 'login' | 'register', setV
                   </div>
                   <AuthInput 
                     icon={ShieldCheck}
-                    placeholder="Matrícula" 
+                    placeholder="Matrícula (6 dígitos)" 
                     required 
+                    maxLength={6}
                     value={formData.registration}
-                    onChange={e => setFormData({...formData, registration: e.target.value})}
+                    onChange={e => setFormData({...formData, registration: e.target.value.substring(0, 6)})}
                   />
                   <AuthInput 
                     icon={Briefcase}
@@ -1342,18 +1324,20 @@ function AuthPage({ view, setView, setUser }: { view: 'login' | 'register', setV
                   <AuthInput 
                     icon={Lock}
                     type="password" 
-                    placeholder="Senha" 
+                    placeholder="Senha (8 dígitos)" 
                     required 
+                    maxLength={8}
                     value={formData.password}
-                    onChange={e => setFormData({...formData, password: e.target.value})}
+                    onChange={e => setFormData({...formData, password: e.target.value.substring(0, 8)})}
                   />
                   <AuthInput 
                     icon={Lock}
                     type="password" 
                     placeholder="Confirmar Senha" 
                     required 
+                    maxLength={8}
                     value={formData.confirmPassword}
-                    onChange={e => setFormData({...formData, confirmPassword: e.target.value})}
+                    onChange={e => setFormData({...formData, confirmPassword: e.target.value.substring(0, 8)})}
                   />
                 </div>
               ) : (
@@ -1362,16 +1346,18 @@ function AuthPage({ view, setView, setUser }: { view: 'login' | 'register', setV
                     icon={ShieldCheck}
                     placeholder="Sua Matrícula" 
                     required 
+                    maxLength={6}
                     value={formData.registration}
-                    onChange={e => setFormData({...formData, registration: e.target.value})}
+                    onChange={e => setFormData({...formData, registration: e.target.value.substring(0, 6)})}
                   />
                   <AuthInput 
                     icon={Lock}
                     type="password" 
                     placeholder="Sua Senha" 
                     required 
+                    maxLength={8}
                     value={formData.password}
-                    onChange={e => setFormData({...formData, password: e.target.value})}
+                    onChange={e => setFormData({...formData, password: e.target.value.substring(0, 8)})}
                   />
                 </div>
               )}
