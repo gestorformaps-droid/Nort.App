@@ -414,6 +414,26 @@ export default function App() {
   }, [activeTab]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [currentPos, setCurrentPos] = useState<{ latitude: number, longitude: number } | null>(null);
+
+  useEffect(() => {
+    let watchId: number;
+    if (navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          setCurrentPos({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          });
+        },
+        (err) => console.log('Radar GPS error:', err),
+        { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 }
+      );
+    }
+    return () => {
+      if (watchId) navigator.geolocation.clearWatch(watchId);
+    };
+  }, []);
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1024);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState<{ id: string, title: string, message: string, type: 'training' | 'occurrence', category: 'personal' | 'manager', date: string, read: boolean, userId?: number, occurrenceId?: number }[]>([]);
@@ -601,13 +621,13 @@ export default function App() {
     }
   }, [user, activeTab, activities.length]);
 
-  // Auto-refresh for Map Tab (every 30 seconds)
+  // Auto-refresh for Map Tab (every 5 seconds)
   useEffect(() => {
     if (!user || activeTab !== 'manager') return;
     
     const interval = setInterval(() => {
       fetchData();
-    }, 30000);
+    }, 5000);
     
     return () => clearInterval(interval);
   }, [user, activeTab, fetchData]);
