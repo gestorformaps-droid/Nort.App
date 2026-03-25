@@ -61,6 +61,9 @@ app.post("/api/auth/login", async (req, res) => {
     .single();
 
   if (user) {
+    if (user.role === 'manager' && !user.is_active) {
+      return res.status(403).json({ error: "approval_pending" });
+    }
     res.json({ 
       ...user, 
       is_active: !!user.is_active,

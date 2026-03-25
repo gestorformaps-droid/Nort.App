@@ -421,6 +421,7 @@ export default function App() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [viewingEmployeeId, setViewingEmployeeId] = useState<number | null>(null);
   const [currentToast, setCurrentToast] = useState<{ title: string, message: string, occurrenceId?: number } | null>(null);
+  const [isPendingApproval, setIsPendingApproval] = useState(false);
 
   // Data states
   // Data states
@@ -695,9 +696,44 @@ export default function App() {
     setIsMobileMenuOpen(false);
   };
 
+  if (isPendingApproval) {
+    return (
+      <div className="min-h-screen bg-[#00153D] flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
+        <div className="fixed inset-0 bg-gradient-to-b from-[#1A3A8A] via-[#00153D] to-[#000B26] -z-10" />
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white/5 backdrop-blur-2xl p-8 rounded-[32px] border border-white/10 shadow-2xl max-w-sm w-full"
+        >
+          <div className="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+            <Clock className="text-blue-400" size={40} />
+          </div>
+          <h1 className="text-2xl font-bold text-white mb-3 tracking-tight">Aguardando Aprovação</h1>
+          <p className="text-slate-400 text-sm mb-8 leading-relaxed">
+            Seu perfil de gestor foi criado com sucesso! Por motivos de segurança, 
+            um administrador precisa liberar seu acesso antes de você começar.
+          </p>
+          <div className="bg-blue-900/20 border border-blue-500/20 p-4 rounded-2xl mb-8">
+            <p className="text-xs text-blue-300">
+              Entre em contato com o responsável pelo sistema para solicitar a liberação do seu acesso.
+            </p>
+          </div>
+          <Button 
+            variant="outline" 
+            onClick={() => setIsPendingApproval(false)}
+            className="w-full border-white/10 text-white hover:bg-white/10 h-12 rounded-xl"
+          >
+            Voltar para o Login
+          </Button>
+        </motion.div>
+      </div>
+    );
+  }
+
   if (view === 'login' || view === 'register') {
-    return <AuthPage view={view} setView={setView} setUser={(u) => {
+    return <AuthPage view={view} setView={setView} setIsPendingApproval={setIsPendingApproval} setUser={(u) => {
       setUser(u);
+      setIsPendingApproval(false); // Clear if user was pending but now cleared
       setView('dashboard');
       setActiveTab(u.role === 'manager' ? 'manager' : 'profile');
     }} />;
@@ -1154,7 +1190,7 @@ function Logo({ className }: { className?: string }) {
 
 // --- Auth Page ---
 
-function AuthPage({ view, setView, setUser }: { view: 'login' | 'register', setView: (v: 'login' | 'register') => void, setUser: (u: User) => void }) {
+function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'login' | 'register', setView: (v: 'login' | 'register') => void, setUser: (u: User) => void, setIsPendingApproval: (v: boolean) => void }) {
   const [formData, setFormData] = useState({
     name: '',
     registration: '',
@@ -1195,7 +1231,11 @@ function AuthPage({ view, setView, setUser }: { view: 'login' | 'register', setV
         localStorage.setItem('user', JSON.stringify(data));
         setUser(data);
       } else {
-        setError(data.error);
+        if (data.error === 'approval_pending') {
+          setIsPendingApproval(true);
+        } else {
+          setError(data.error);
+        }
       }
     } catch (err) {
       setError('Erro ao conectar com o servidor');
