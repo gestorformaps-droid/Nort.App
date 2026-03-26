@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Component, ReactNode } from 'react';
 import { 
   LayoutDashboard, 
   PlusCircle, 
@@ -1044,7 +1044,8 @@ export default function App() {
             ? "overflow-hidden p-2 sm:p-3 lg:p-5"
             : "overflow-y-auto p-2 sm:p-3 lg:p-6 no-scrollbar"
         )}>
-          <AnimatePresence mode="wait">
+          <ErrorBoundary>
+            <AnimatePresence mode="wait" initial={false}>
             {activeTab === 'profile' && (
               <motion.div 
                 key="profile"
@@ -1164,10 +1165,35 @@ export default function App() {
               </motion.div>
             )}
           </AnimatePresence>
+          </ErrorBoundary>
         </div>
       </main>
     </div>
   );
+}
+
+// --- Error Boundary ---
+class ErrorBoundary extends React.Component<any, any> {
+  state = { hasError: false };
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch(error: any, errorInfo: any) {
+    console.error("ErrorBoundary caught an error", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center p-8 text-center min-h-[400px] bg-white rounded-3xl m-4 shadow-sm">
+          <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-4">
+            <AlertCircle size={32} />
+          </div>
+          <h3 className="text-lg font-bold text-slate-900 mb-2">Ops! Algo deu errado.</h3>
+          <p className="text-sm text-slate-500 mb-6 max-w-xs">A aba não pôde ser carregada corretamente.</p>
+          <Button onClick={() => window.location.reload()}>Recarregar Página</Button>
+        </div>
+      );
+    }
+    return (this as any).props.children;
+  }
 }
 
 // --- Components ---
@@ -2880,13 +2906,13 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
             className="absolute top-14 right-4 z-[2001]"
           >
             <div className="flex flex-col gap-1.5 bg-slate-900/60 backdrop-blur-xl border border-white/20 p-2 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.4)]">
-              {[
+              {( [
                   { label: 'Total', value: stats.total, color: '#0F172A', icon: <ClipboardList size={12} /> },
                   { label: 'Concluídas', value: stats.completed, color: '#3B82F6', icon: <CheckCircle2 size={12} /> },
                   { label: 'Em Andamento', value: stats.inProgress, color: '#EAB308', icon: <Clock size={12} /> },
                   { label: 'Pausadas', value: stats.paused, color: '#F97316', icon: <AlertCircle size={12} /> },
                   { label: 'Canceladas', value: stats.canceled, color: '#EF4444', icon: <XCircle size={12} /> },
-              ].map((s) => (
+              ] || []).map((s) => (
                 <div key={s.label} className="flex items-center gap-2 px-1.5 py-1">
                   <div className="w-5 h-5 rounded-full flex items-center justify-center text-white shadow shrink-0" style={{ backgroundColor: s.color }}>
                     {s.icon}
@@ -2974,10 +3000,10 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
               attribution='&copy; Google Maps'
               maxZoom={22}
             />
-            {filteredActivities.map(act => (
+            {(filteredActivities || []).map(act => (
               <Marker 
-                key={act.id} 
-                position={[act.latitude, act.longitude]}
+                key={act?.id} 
+                position={[act?.latitude || 0, act?.longitude || 0]}
                 eventHandlers={{
                   click: () => {
                     if (window.innerWidth >= 1024) {
@@ -3049,7 +3075,7 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
               </Marker>
             ))}
             <MapResizer trigger={isMapFullscreen} />
-            <MapUpdater activities={filteredActivities} />
+            <MapUpdater activities={filteredActivities} filters={filters} />
           </MapContainer>
         </div>
       </div>
@@ -3280,28 +3306,28 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
     });
   }, [activities, filters]);
 
-  const chartData = useMemo(() => ACTIVITY_STATUSES.map(s => ({
+  const chartData = useMemo(() => (ACTIVITY_STATUSES || []).map(s => ({
     name: s,
-    value: filteredActivities.filter(a => a.status === s).length,
+    value: (filteredActivities || []).filter(a => a?.status === s).length,
     color: STATUS_COLORS[s]
   })), [filteredActivities]);
 
   const totalActivities = useMemo(() => chartData.reduce((acc, item) => acc + item.value, 0), [chartData]);
 
   const exportToExcel = () => {
-    const data = filteredActivities.map(a => ({
-      'ID': a.id,
-      'OM': a.om_number,
-      'Operação': a.operation,
-      'Modelo': a.model,
-      'Código': a.code,
-      'Local': a.location_name,
-      'Funcionário': a.user_name,
-      'Status': a.status,
-      'Data': format(parseISO(a.created_at), 'dd/MM/yyyy HH:mm'),
-      'Tempo Ativo (min)': a.total_active_time || 0,
-      'Tempo Parado (min)': a.total_paused_time || 0,
-      'Descrição': a.description
+    const data = (filteredActivities || []).map(a => ({
+      'ID': a?.id,
+      'OM': a?.om_number,
+      'Operação': a?.operation,
+      'Modelo': a?.model,
+      'Código': a?.code,
+      'Local': a?.location_name,
+      'Funcionário': a?.user_name,
+      'Status': a?.status,
+      'Data': a?.created_at ? format(parseISO(a.created_at), 'dd/MM/yyyy HH:mm') : '-',
+      'Tempo Ativo (min)': a?.total_active_time || 0,
+      'Tempo Parado (min)': a?.total_paused_time || 0,
+      'Descrição': a?.description
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(data);
@@ -3320,8 +3346,8 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
       registrations = [];
     }
     
-    const names = registrations.map(reg => {
-      const emp = employees.find(e => e.registration === reg);
+    const names = (registrations || []).map(reg => {
+      const emp = (employees || []).find(e => e?.registration === reg);
       return emp ? emp.name : reg;
     });
 
@@ -3399,13 +3425,13 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
           />
           <Select 
             label="Código"
-            options={OM_CODES.map(c => ({ value: c, label: c }))}
+            options={(OM_CODES || []).map(c => ({ value: c, label: c }))}
             value={filters.serviceCode}
             onChange={e => setFilters({...filters, serviceCode: e.target.value})}
           />
           <Select 
             label="Status"
-            options={ACTIVITY_STATUSES.map(s => ({ value: s, label: s }))}
+            options={(ACTIVITY_STATUSES || []).map(s => ({ value: s, label: s }))}
             value={filters.status}
             onChange={e => setFilters({...filters, status: e.target.value})}
           />
@@ -3732,7 +3758,7 @@ function DashboardEmployeesView({ employees, activities, onUpdate, initialEmploy
 
   useEffect(() => {
     if (initialEmployeeId) {
-      const emp = employees.find(e => e.id === initialEmployeeId);
+      const emp = (employees || []).find(e => e?.id === initialEmployeeId);
       if (emp) {
         setSelectedEmployee(emp);
         setIsReadOnly(true);
@@ -3746,13 +3772,13 @@ function DashboardEmployeesView({ employees, activities, onUpdate, initialEmploy
     setIsReadOnly(false);
   };
   
-  const filteredEmployees = employees.filter(e => 
-    e.name.toLowerCase().includes(search.toLowerCase()) || 
-    e.registration.toLowerCase().includes(search.toLowerCase())
+  const filteredEmployees = (employees || []).filter(e => 
+    e?.name?.toLowerCase().includes(search.toLowerCase()) || 
+    e?.registration?.toLowerCase().includes(search.toLowerCase())
   );
 
   const getEmployeeStats = (userId: number) => {
-    const userActivities = activities.filter(a => a.user_id === userId);
+    const userActivities = (activities || []).filter(a => a?.user_id === userId);
     return {
       total: userActivities.length,
       completed: userActivities.filter(a => a.status === 'Concluída').length,
@@ -3802,7 +3828,7 @@ function DashboardEmployeesView({ employees, activities, onUpdate, initialEmploy
 
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredEmployees.map(employee => {
+          {(filteredEmployees || []).map(employee => {
             const stats = getEmployeeStats(employee.id);
             return (
               <motion.div 
@@ -3871,7 +3897,7 @@ function DashboardEmployeesView({ employees, activities, onUpdate, initialEmploy
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredEmployees.map(employee => {
+                {(filteredEmployees || []).map(employee => {
                   const stats = getEmployeeStats(employee.id);
                   return (
                     <tr 
@@ -4297,15 +4323,27 @@ function MapResizer({ trigger }: { trigger: boolean }) {
   return null;
 }
 
-function MapUpdater({ activities }: { activities: Activity[] }) {
+function MapUpdater({ activities, filters }: { activities: Activity[], filters?: any }) {
   const map = useMap();
-  
+  const lastFilterRef = React.useRef<string>('');
+  const hasInitializedRef = React.useRef(false);
+
   useEffect(() => {
-    if (activities.length > 0) {
-      const bounds = L.latLngBounds(activities.map(a => [a.latitude, a.longitude]));
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+    // Criamos uma chave para identificar se os filtros mudaram de fato
+    const filterKey = JSON.stringify(filters || {});
+    const isFilterChange = filterKey !== lastFilterRef.current;
+    
+    // Só faz o "fit" se for a primeira vez com dados OU se o usuário mudou os filtros
+    if (activities.length > 0 && (!hasInitializedRef.current || isFilterChange)) {
+      const validActivities = activities.filter(a => a.latitude && a.longitude);
+      if (validActivities.length > 0) {
+        const bounds = L.latLngBounds(validActivities.map(a => [a.latitude, a.longitude]));
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+        hasInitializedRef.current = true;
+        lastFilterRef.current = filterKey;
+      }
     }
-  }, [activities, map]);
+  }, [activities.length, filters, map]);
 
   return null;
 }
@@ -4348,9 +4386,9 @@ function DashboardsView({ activities, occurrences, employees }: { activities: Ac
   const employeeNames = useMemo(() => ['Todos', ...Array.from(new Set(activities.map(a => a.user_name))).sort()], [activities]);
 
   const activitiesByStatus = useMemo(() => {
-    return ACTIVITY_STATUSES.map(status => ({
+    return (ACTIVITY_STATUSES || []).map(status => ({
       name: status,
-      value: activities.filter(a => a.status === status).length,
+      value: (activities || []).filter(a => a?.status === status).length,
       color: STATUS_COLORS[status],
       fill: STATUS_COLORS[status]
     })).filter(item => item.value > 0);
@@ -4365,7 +4403,7 @@ function DashboardsView({ activities, occurrences, employees }: { activities: Ac
     ];
     return types.map(t => ({
       ...t,
-      value: filteredOccurrences.filter(o => o.type === t.name).length
+      value: (filteredOccurrences || []).filter(o => o?.type === t.name).length
     })).filter(item => item.value > 0);
   }, [filteredOccurrences]);
 
@@ -4636,7 +4674,7 @@ function DashboardsView({ activities, occurrences, employees }: { activities: Ac
                   <YAxis dataKey="name" type="category" width={90} axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#64748B' }} />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar dataKey="count" radius={[0, 6, 6, 0]} maxBarSize={18} background={{ fill: '#F8FAFC', radius: 6 }}>
-                    {occurrencesByLocation.map((_, i) => (
+                    {(occurrencesByLocation || []).map((_, i) => (
                       <Cell key={i} fill={i === 0 ? '#EF4444' : i === 1 ? '#F97316' : '#6366F1'} />
                     ))}
                   </Bar>
@@ -4671,13 +4709,13 @@ function DashboardsView({ activities, occurrences, employees }: { activities: Ac
               </div>
             </div>
             <div className="flex flex-col gap-3 flex-1">
-              {[
+              {( [
                 { name: 'Segurança', color: '#EF4444' },
                 { name: 'Operacional', color: '#6366F1' },
                 { name: 'Ambiental', color: '#10B981' },
                 { name: 'Outros', color: '#94A3B8' }
-              ].map(t => {
-                const count = occurrences.filter(o => o.type === t.name).length;
+              ] || []).map(t => {
+                const count = (occurrences || []).filter(o => o?.type === t.name).length;
                 const pct = totalOccurrences > 0 ? Math.round((count / totalOccurrences) * 100) : 0;
                 return (
                   <div key={t.name}>
