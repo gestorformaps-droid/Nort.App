@@ -2466,8 +2466,8 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
   return (
     <div className="space-y-4 lg:space-y-6">
       {/* Filters */}
-      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap gap-3 lg:gap-4 items-end">
-        <div className="w-full sm:flex-1 min-w-[140px]">
+      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-2 lg:flex lg:flex-wrap gap-3 lg:gap-4 items-end">
+        <div className="min-w-[140px]">
           <Input 
             label="Início" 
             type="date" 
@@ -2475,7 +2475,7 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
             onChange={e => setFilters({...filters, startDate: e.target.value})}
           />
         </div>
-        <div className="w-full sm:flex-1 min-w-[140px]">
+        <div className="min-w-[140px]">
           <Input 
             label="Fim" 
             type="date" 
@@ -2483,7 +2483,7 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
             onChange={e => setFilters({...filters, endDate: e.target.value})}
           />
         </div>
-        <div className="w-full sm:flex-1 min-w-[140px]">
+        <div className="lg:flex-1 min-w-[140px]">
           <Select 
             label="Cód. Serviço"
             options={[
@@ -2494,7 +2494,7 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
             onChange={e => setFilters({...filters, serviceCode: e.target.value})}
           />
         </div>
-        <Button variant="outline" className="w-full lg:w-auto h-[42px]" onClick={() => setFilters({
+        <Button variant="outline" className="lg:w-auto h-[42px]" onClick={() => setFilters({
           startDate: getBrasiliaDateString(),
           endDate: getBrasiliaDateString(),
           serviceCode: ''
@@ -2822,7 +2822,7 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
         {/* Filters */}
         <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-2">
           {/* Datas - grid adaptável */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <div>
               <Input 
                 label="Início" 
@@ -2841,7 +2841,7 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
             </div>
           </div>
           {/* Código e Status - grid adaptável */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <div>
               <Select 
                 label="Código"
@@ -2906,13 +2906,13 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
             className="absolute top-14 right-4 z-[2001]"
           >
             <div className="flex flex-col gap-1.5 bg-slate-900/60 backdrop-blur-xl border border-white/20 p-2 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.4)]">
-              {( [
+              {[
                   { label: 'Total', value: stats.total, color: '#0F172A', icon: <ClipboardList size={12} /> },
                   { label: 'Concluídas', value: stats.completed, color: '#3B82F6', icon: <CheckCircle2 size={12} /> },
                   { label: 'Em Andamento', value: stats.inProgress, color: '#EAB308', icon: <Clock size={12} /> },
                   { label: 'Pausadas', value: stats.paused, color: '#F97316', icon: <AlertCircle size={12} /> },
                   { label: 'Canceladas', value: stats.canceled, color: '#EF4444', icon: <XCircle size={12} /> },
-              ] || []).map((s) => (
+              ].map((s) => (
                 <div key={s.label} className="flex items-center gap-2 px-1.5 py-1">
                   <div className="w-5 h-5 rounded-full flex items-center justify-center text-white shadow shrink-0" style={{ backgroundColor: s.color }}>
                     {s.icon}
@@ -4713,12 +4713,12 @@ function DashboardsView({ activities, occurrences, employees }: { activities: Ac
               </div>
             </div>
             <div className="flex flex-col gap-3 flex-1">
-              {( [
+              {[
                 { name: 'Segurança', color: '#EF4444' },
                 { name: 'Operacional', color: '#6366F1' },
                 { name: 'Ambiental', color: '#10B981' },
                 { name: 'Outros', color: '#94A3B8' }
-              ] || []).map(t => {
+              ].map(t => {
                 const count = (occurrences || []).filter(o => o?.type === t.name).length;
                 const pct = totalOccurrences > 0 ? Math.round((count / totalOccurrences) * 100) : 0;
                 return (
