@@ -3408,7 +3408,7 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
     <div className="space-y-4 lg:space-y-8">
       {/* Filters */}
       <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 items-end">
           <Input 
             label="Início" 
             type="date" 
@@ -3435,15 +3435,19 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
             value={filters.status}
             onChange={e => setFilters({...filters, status: e.target.value})}
           />
+          <Button 
+            variant="outline" 
+            className="w-full lg:w-auto h-[38px] text-xs lg:text-sm font-bold border-slate-200 hover:bg-slate-50 transition-colors" 
+            onClick={() => setFilters({
+              startDate: getBrasiliaDateString(),
+              endDate: getBrasiliaDateString(),
+              serviceCode: '',
+              status: ''
+            })}
+          >
+            Limpar
+          </Button>
         </div>
-        <Button variant="outline" className="w-full h-[38px] text-sm" onClick={() => setFilters({
-          startDate: getBrasiliaDateString(),
-          endDate: getBrasiliaDateString(),
-          serviceCode: '',
-          status: ''
-        })}>
-          Limpar
-        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
