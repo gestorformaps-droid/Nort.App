@@ -4261,11 +4261,11 @@ function DashboardAddOccurrenceModal({ onClose, onSave, loading, initialLocation
           <div className="flex gap-3 pt-4">
             <Button variant="outline" onClick={onClose} className="flex-1 whitespace-nowrap" type="button">Cancelar</Button>
             <Button 
-              className="flex-1 whitespace-nowrap" 
+              className="flex-1" 
               type="submit" 
               disabled={loading || !formData.title.trim() || !formData.description.trim() || !formData.location.trim()}
             >
-              {loading ? 'Registrando...' : 'Registrar Ocorrência'}
+              {loading ? 'Registrando...' : 'Registrar'}
             </Button>
           </div>
         </form>
