@@ -2375,7 +2375,8 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
   const [filters, setFilters] = useState({
     startDate: getBrasiliaDateString(),
     endDate: getBrasiliaDateString(),
-    serviceCode: ''
+    serviceCode: '',
+    search: ''
   });
   const [justificationModal, setJustificationModal] = useState<{ id: number, status: ActivityStatus } | null>(null);
   const [justification, setJustification] = useState('');
@@ -2416,8 +2417,11 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
     
     const dateMatch = isWithinInterval(date, { start, end });
     const codeMatch = !filters.serviceCode || a.code === filters.serviceCode;
+    const searchMatch = !filters.search || 
+      a.operation?.toLowerCase().includes(filters.search.toLowerCase()) ||
+      a.om_number?.toLowerCase().includes(filters.search.toLowerCase());
     
-    return dateMatch && codeMatch;
+    return dateMatch && codeMatch && searchMatch;
   });
 
   const handleStatusChange = async (id: number, newStatus: ActivityStatus, just?: string) => {
@@ -2466,41 +2470,66 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
   return (
     <div className="space-y-4 lg:space-y-6">
       {/* Filters */}
-      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm grid grid-cols-2 lg:flex lg:flex-wrap gap-3 lg:gap-4 items-end">
-        <div className="min-w-[140px]">
-          <Input 
-            label="Início" 
-            type="date" 
-            value={filters.startDate}
-            onChange={e => setFilters({...filters, startDate: e.target.value})}
-          />
+      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div className="flex-1 space-y-1">
+          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Busca</label>
+          <div className="relative">
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input 
+              type="text"
+              placeholder="Buscar por OM ou Operação..."
+              value={filters.search}
+              onChange={(e) => setFilters({...filters, search: e.target.value})}
+              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+            />
+          </div>
         </div>
-        <div className="min-w-[140px]">
-          <Input 
-            label="Fim" 
-            type="date" 
-            value={filters.endDate}
-            onChange={e => setFilters({...filters, endDate: e.target.value})}
-          />
+        
+        <div className="grid grid-cols-2 lg:flex gap-3 items-end">
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Início</label>
+            <div className="relative">
+              <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
+              <input 
+                type="date"
+                value={filters.startDate}
+                onChange={e => setFilters({...filters, startDate: e.target.value})}
+                className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px]"
+              />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Fim</label>
+            <div className="relative">
+              <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
+              <input 
+                type="date"
+                value={filters.endDate}
+                onChange={e => setFilters({...filters, endDate: e.target.value})}
+                className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px]"
+              />
+            </div>
+          </div>
+          <div className="space-y-1 min-w-[120px]">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Cód. Serviço</label>
+            <select 
+              value={filters.serviceCode}
+              onChange={e => setFilters({ ...filters, serviceCode: e.target.value })}
+              className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+            >
+              <option value="">Todos</option>
+              {OM_CODES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <Button variant="outline" className="h-[42px] px-3 shrink-0" onClick={() => setFilters({
+            startDate: getBrasiliaDateString(),
+            endDate: getBrasiliaDateString(),
+            serviceCode: '',
+            search: ''
+          })}>
+            <X size={16} />
+          </Button>
         </div>
-        <div className="lg:flex-1 min-w-[140px]">
-          <Select 
-            label="Cód. Serviço"
-            options={[
-              { value: '', label: 'Todos os Códigos' },
-              ...OM_CODES.map(c => ({ value: c, label: c }))
-            ]}
-            value={filters.serviceCode}
-            onChange={e => setFilters({...filters, serviceCode: e.target.value})}
-          />
-        </div>
-        <Button variant="outline" className="lg:w-auto h-[42px]" onClick={() => setFilters({
-          startDate: getBrasiliaDateString(),
-          endDate: getBrasiliaDateString(),
-          serviceCode: ''
-        })}>
-          Limpar
-        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
@@ -2764,7 +2793,8 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
     startDate: getBrasiliaDateString(),
     endDate: getBrasiliaDateString(),
     serviceCode: '',
-    status: ''
+    status: '',
+    search: ''
   });
 
   const getInvolvedTeam = (act: Activity) => {
@@ -2801,8 +2831,11 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
       const dateMatch = isWithinInterval(date, { start, end });
       const serviceMatch = !filters.serviceCode || a.code === filters.serviceCode;
       const statusMatch = !filters.status || a.status === filters.status;
+      const searchMatch = !filters.search || 
+        a.operation?.toLowerCase().includes(filters.search.toLowerCase()) ||
+        a.om_number?.toLowerCase().includes(filters.search.toLowerCase());
       
-      return dateMatch && serviceMatch && statusMatch;
+      return dateMatch && serviceMatch && statusMatch && searchMatch;
     });
   }, [activities, filters]);
 
@@ -2820,52 +2853,81 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
       {/* LEFT COLUMN: Filtros + Stats */}
       <div className="flex flex-col gap-2 lg:overflow-y-auto lg:no-scrollbar min-h-0">
         {/* Filters */}
-        <div className="bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-2">
-          {/* Datas - grid adaptável */}
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <Input 
-                label="Início" 
-                type="date" 
-                value={filters.startDate}
-                onChange={e => setFilters({...filters, startDate: e.target.value})}
-              />
-            </div>
-            <div>
-              <Input 
-                label="Fim" 
-                type="date" 
-                value={filters.endDate}
-                onChange={e => setFilters({...filters, endDate: e.target.value})}
+        <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Busca</label>
+            <div className="relative">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input 
+                type="text"
+                placeholder="OM ou Operação..."
+                value={filters.search}
+                onChange={e => setFilters({...filters, search: e.target.value})}
+                className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
               />
             </div>
           </div>
-          {/* Código e Status - grid adaptável */}
+          
           <div className="grid grid-cols-2 gap-2">
-            <div>
-              <Select 
-                label="Código"
-                options={OM_CODES.map(c => ({ value: c, label: c }))}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Início</label>
+              <div className="relative">
+                <Calendar size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input 
+                  type="date"
+                  value={filters.startDate}
+                  onChange={e => setFilters({...filters, startDate: e.target.value})}
+                  className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+                />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Fim</label>
+              <div className="relative">
+                <Calendar size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input 
+                  type="date"
+                  value={filters.endDate}
+                  onChange={e => setFilters({...filters, endDate: e.target.value})}
+                  className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Código</label>
+              <select 
                 value={filters.serviceCode}
                 onChange={e => setFilters({...filters, serviceCode: e.target.value})}
-              />
+                className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+              >
+                <option value="">Todos</option>
+                {OM_CODES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
             </div>
-            <div>
-              <Select 
-                label="Status"
-                options={ACTIVITY_STATUSES.map(s => ({ value: s, label: s }))}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Status</label>
+              <select 
                 value={filters.status}
                 onChange={e => setFilters({...filters, status: e.target.value})}
-              />
+                className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+              >
+                <option value="">Todos</option>
+                {ACTIVITY_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
             </div>
           </div>
-          <Button variant="outline" className="w-full h-[38px] text-sm mt-1" onClick={() => setFilters({
+
+          <Button variant="outline" className="w-full h-[42px] text-sm mt-1" onClick={() => setFilters({
             startDate: getBrasiliaDateString(),
             endDate: getBrasiliaDateString(),
             serviceCode: '',
-            status: ''
+            status: '',
+            search: ''
           })}>
-            Limpar
+            <X size={16} className="mr-2" /> Limpar
           </Button>
         </div>
 
@@ -3263,7 +3325,8 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
     startDate: getBrasiliaDateString(),
     endDate: getBrasiliaDateString(),
     serviceCode: '',
-    status: ''
+    status: '',
+    search: ''
   });
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [selectedEmployee, setSelectedEmployee] = useState<User | null>(null);
@@ -3301,8 +3364,12 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
       const dateMatch = isWithinInterval(date, { start, end });
       const serviceMatch = !filters.serviceCode || a.code === filters.serviceCode;
       const statusMatch = !filters.status || a.status === filters.status;
+      const searchMatch = !filters.search || 
+        a.operation?.toLowerCase().includes(filters.search.toLowerCase()) ||
+        a.om_number?.toLowerCase().includes(filters.search.toLowerCase()) ||
+        (a.description && a.description.toLowerCase().includes(filters.search.toLowerCase()));
       
-      return dateMatch && serviceMatch && statusMatch;
+      return dateMatch && serviceMatch && statusMatch && searchMatch;
     });
   }, [activities, filters]);
 
@@ -3408,45 +3475,85 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
     <div className="space-y-4 lg:space-y-8">
       {/* Filters */}
       <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 items-end">
-          <Input 
-            label="Início" 
-            type="date" 
-            value={filters.startDate}
-            onChange={e => setFilters({...filters, startDate: e.target.value})}
-            className="text-xs"
-          />
-          <Input 
-            label="Fim" 
-            type="date" 
-            value={filters.endDate}
-            onChange={e => setFilters({...filters, endDate: e.target.value})}
-            className="text-xs"
-          />
-          <Select 
-            label="Código"
-            options={(OM_CODES || []).map(c => ({ value: c, label: c }))}
-            value={filters.serviceCode}
-            onChange={e => setFilters({...filters, serviceCode: e.target.value})}
-          />
-          <Select 
-            label="Status"
-            options={(ACTIVITY_STATUSES || []).map(s => ({ value: s, label: s }))}
-            value={filters.status}
-            onChange={e => setFilters({...filters, status: e.target.value})}
-          />
-          <Button 
-            variant="outline" 
-            className="w-full lg:w-auto h-[38px] text-xs lg:text-sm font-bold border-slate-200 hover:bg-slate-50 transition-colors" 
-            onClick={() => setFilters({
-              startDate: getBrasiliaDateString(),
-              endDate: getBrasiliaDateString(),
-              serviceCode: '',
-              status: ''
-            })}
-          >
-            Limpar
-          </Button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
+          <div className="lg:col-span-2 space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Busca</label>
+            <div className="relative">
+              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input 
+                type="text"
+                placeholder="Buscar OM, Operação ou Descrição..."
+                value={filters.search}
+                onChange={e => setFilters({...filters, search: e.target.value})}
+                className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+              />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Início</label>
+            <div className="relative">
+              <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
+              <input 
+                type="date"
+                value={filters.startDate}
+                onChange={e => setFilters({...filters, startDate: e.target.value})}
+                className="w-full pl-8 pr-1 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px]"
+              />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Fim</label>
+            <div className="relative">
+              <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
+              <input 
+                type="date"
+                value={filters.endDate}
+                onChange={e => setFilters({...filters, endDate: e.target.value})}
+                className="w-full pl-8 pr-1 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px]"
+              />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Código</label>
+            <select 
+              value={filters.serviceCode}
+              onChange={e => setFilters({...filters, serviceCode: e.target.value})}
+              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+            >
+              <option value="">Todos</option>
+              {(OM_CODES || []).map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-row gap-2 items-end">
+            <div className="flex-1 space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Status</label>
+              <select 
+                value={filters.status}
+                onChange={e => setFilters({...filters, status: e.target.value})}
+                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+              >
+                <option value="">Todos</option>
+                {(ACTIVITY_STATUSES || []).map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+            <Button 
+              variant="outline" 
+              className="h-[42px] border-slate-200 hover:bg-slate-50 transition-colors px-3 shrink-0" 
+              onClick={() => setFilters({
+                startDate: getBrasiliaDateString(),
+                endDate: getBrasiliaDateString(),
+                serviceCode: '',
+                status: '',
+                search: ''
+              })}
+            >
+              <X size={16} />
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -3792,19 +3899,22 @@ function DashboardEmployeesView({ employees, activities, onUpdate, initialEmploy
 
   return (
     <div className="space-y-4 lg:space-y-6">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div className="flex flex-col sm:flex-row flex-1 items-stretch sm:items-center gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input 
-              type="text"
-              placeholder="Buscar por nome ou matrícula..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="w-full bg-white border border-slate-200 rounded-xl py-2.5 lg:py-2 pl-10 pr-4 text-xs lg:text-base lg:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all shadow-sm"
-            />
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+        <div className="flex flex-col sm:flex-row flex-1 items-end gap-4">
+          <div className="flex-1 max-w-md space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Busca</label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <input 
+                type="text"
+                placeholder="Buscar por nome ou matrícula..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all shadow-sm h-[42px]"
+              />
+            </div>
           </div>
-          <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 self-start sm:self-auto shadow-sm">
+          <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 self-start sm:self-auto shadow-sm mb-[0px] h-[42px] items-center">
             <button 
               onClick={() => setViewMode('grid')}
               className={cn(
@@ -4071,18 +4181,21 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
 
   return (
     <div className="flex flex-col gap-4 lg:gap-6 flex-1 min-h-0 no-scrollbar">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex-1 relative">
-          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input 
-            type="text"
-            placeholder="Buscar ocorrências..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm"
-          />
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div className="flex-1 space-y-1">
+          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Busca</label>
+          <div className="relative">
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input 
+              type="text"
+              placeholder="Buscar ocorrências..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+            />
+          </div>
         </div>
-        <div className="grid grid-cols-2 gap-3 mb-2">
+        <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Categoria</label>
             <select 
