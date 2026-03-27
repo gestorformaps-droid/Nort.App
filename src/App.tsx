@@ -3153,9 +3153,10 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
           >
             <button 
               onClick={() => setSelectedActivity(null)}
-              className="absolute top-4 right-4 p-2 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors text-slate-500 z-10 shadow-sm"
+              className="absolute top-5 right-5 p-2 bg-white/80 backdrop-blur-sm border border-slate-200 hover:bg-slate-50 rounded-full transition-all text-slate-600 z-[1010] shadow-md hover:scale-110 active:scale-95"
+              aria-label="Fechar"
             >
-              <X size={20} />
+              <X size={24} strokeWidth={2.5} />
             </button>
 
             <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 lg:space-y-8 no-scrollbar pr-12">
