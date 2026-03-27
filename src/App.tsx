@@ -2848,7 +2848,7 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
   }), [filteredActivities]);
 
   return (
-    <div className="lg:grid lg:grid-cols-[1fr_2fr] xl:grid-cols-[340px_1fr] lg:gap-4 flex flex-col gap-3 h-full min-h-0">
+    <div className="lg:grid lg:grid-cols-[340px_1fr] lg:gap-4 flex flex-col gap-3 h-full min-h-0">
 
       {/* LEFT COLUMN: Filtros + Stats */}
       <div className="flex flex-col gap-2 lg:overflow-y-auto lg:no-scrollbar min-h-0">
