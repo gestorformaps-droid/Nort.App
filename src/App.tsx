@@ -3142,7 +3142,6 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
         </div>
       </div>
 
-      {/* Desktop Drawer */}
       <AnimatePresence>
         {selectedActivity && (
           <motion.div 
@@ -3150,22 +3149,21 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-white shadow-2xl z-[1001] flex flex-col border-l border-slate-200"
+            className="fixed top-0 right-0 h-full w-full sm:w-[380px] bg-white shadow-2xl z-[1001] flex flex-col border-l border-slate-200"
           >
-              <div className="p-4 lg:p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                <div className="min-w-0">
-                  <h3 className="text-base lg:text-lg font-bold text-slate-900 truncate">Detalhes do Registro</h3>
-                  <p className="text-[10px] lg:text-xs text-slate-500 font-medium">OM: {selectedActivity.om_number}</p>
-                </div>
-                <button 
-                  onClick={() => setSelectedActivity(null)}
-                  className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-500 shrink-0"
-                >
-                  <X size={20} />
-                </button>
+            <button 
+              onClick={() => setSelectedActivity(null)}
+              className="absolute top-4 right-4 p-2 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors text-slate-500 z-10 shadow-sm"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 lg:space-y-8 no-scrollbar pr-12">
+              <div className="mb-6">
+                <h3 className="text-xl font-bold text-slate-900 leading-tight">Detalhes do Registro</h3>
+                <p className="text-xs text-slate-500 font-medium mt-1">OM: {selectedActivity.om_number}</p>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 lg:space-y-8 no-scrollbar">
                 <section className="space-y-4">
                   <div className="flex items-center gap-2">
                     <div className="w-1 h-4 bg-blue-600 rounded-full" />
@@ -3297,14 +3295,6 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
                 </section>
               </div>
 
-              <div className="p-6 border-t border-slate-100 bg-slate-50 flex gap-3">
-                <Button 
-                  onClick={() => setSelectedActivity(null)}
-                  className="flex-1 py-3"
-                >
-                  Fechar
-                </Button>
-              </div>
             </motion.div>
         )}
       </AnimatePresence>
