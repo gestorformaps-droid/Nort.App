@@ -1328,7 +1328,7 @@ function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'log
           animate={{ opacity: 1, y: 0 }}
           className={cn(
             "w-full transition-all duration-500 z-10",
-            view === 'login' ? "max-w-[340px]" : "max-w-[340px] md:max-w-[540px]"
+            (view === 'login' || view === 'forgot_password') ? "max-w-[340px]" : "max-w-[340px] md:max-w-[540px]"
           )}
         >
         <div className="bg-white/5 backdrop-blur-2xl rounded-[32px] border border-white/10 shadow-2xl overflow-hidden">
