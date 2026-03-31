@@ -4259,6 +4259,7 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
   const [filterType, setFilterType] = useState<string>('Todas');
   const [filterDate, setFilterDate] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const [showCategoryFilterList, setShowCategoryFilterList] = useState(false);
 
   const filteredOccurrences = useMemo(() => {
     return occurrences.filter(occ => {
@@ -4320,36 +4321,54 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
 
   return (
     <div className="flex flex-col gap-4 lg:gap-6 flex-1 min-h-0 no-scrollbar">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div className="flex-1 space-y-1">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Busca</label>
-          <div className="relative">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input 
-              type="text"
-              placeholder="Buscar ocorrências..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
-            />
+      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
+          <div className="lg:col-span-5 space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Busca</label>
+            <div className="relative">
+              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input 
+                type="text"
+                placeholder="Buscar ocorrências..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+              />
+            </div>
           </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1">
+
+          <div className="lg:col-span-3 space-y-1 relative">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Categoria</label>
-            <select 
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm truncate h-[42px]"
+            <div 
+              className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
+              onClick={() => setShowCategoryFilterList(!showCategoryFilterList)}
             >
-              <option value="Todas">Todas</option>
-              <option value="Segurança">Segurança</option>
-              <option value="Operacional">Operacional</option>
-              <option value="Ambiental">Ambiental</option>
-              <option value="Outros">Outros</option>
-            </select>
+              <span className="truncate">{filterType || 'Todas'}</span>
+              <ChevronDown size={16} className="text-slate-400 ml-2 shrink-0 mr-1" />
+            </div>
+            
+            {showCategoryFilterList && (
+              <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
+                {['Todas', 'Segurança', 'Operacional', 'Ambiental', 'Outros'].map(type => (
+                  <button
+                    key={type}
+                    type="button"
+                    className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFilterType(type);
+                      setShowCategoryFilterList(false);
+                    }}
+                  >
+                    <span className="text-sm text-slate-900">{type}</span>
+                    {filterType === type && <CheckCircle2 size={14} className="text-blue-500" />}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="space-y-1">
+
+          <div className="lg:col-span-3 space-y-1">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Data</label>
             <div className="relative">
               <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
@@ -4357,9 +4376,20 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
                 type="date"
                 value={filterDate}
                 onChange={(e) => setFilterDate(e.target.value)}
-                className="w-full pl-8 pr-1 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px]"
+                onClick={(e) => (e.target as any).showPicker?.()}
+                className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px] cursor-pointer"
               />
             </div>
+          </div>
+
+          <div className="lg:col-span-1">
+            <Button variant="outline" className="h-[42px] w-full px-0 border-slate-200 hover:bg-slate-50" onClick={() => {
+              setSearchQuery('');
+              setFilterType('Todas');
+              setFilterDate('');
+            }}>
+              <X size={16} />
+            </Button>
           </div>
         </div>
       </div>
