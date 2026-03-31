@@ -3392,7 +3392,6 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
 function DashboardRecordsView({ activities, employees, onTabChange }: { activities: Activity[], employees: User[], onTabChange: (tab: any) => void }) {
   const [filters, setFilters] = useState({
     startDate: getBrasiliaDateString(),
-    endDate: getBrasiliaDateString(),
     serviceCode: '',
     status: '',
     search: ''
@@ -3428,7 +3427,7 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
     return activities.filter(a => {
       const date = parseISO(a.created_at);
       const start = startOfDay(parseISO(filters.startDate));
-      const end = endOfDay(parseISO(filters.endDate));
+      const end = endOfDay(parseISO(filters.startDate));
       
       const dateMatch = isWithinInterval(date, { start, end });
       const serviceMatch = !filters.serviceCode || a.code === filters.serviceCode;
