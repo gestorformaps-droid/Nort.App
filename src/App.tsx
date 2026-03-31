@@ -27,6 +27,7 @@ import {
   Lock,
   Mail,
   ShieldCheck,
+  ShieldAlert,
   Briefcase,
   FileText,
   PieChart as PieChartIcon,
@@ -406,7 +407,7 @@ const Select = ({ label, options, error, ...props }: React.SelectHTMLAttributes<
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
-  const [view, setView] = useState<'login' | 'register' | 'dashboard'>('login');
+  const [view, setView] = useState<'login' | 'register' | 'forgot_password' | 'dashboard'>('login');
   const [activeTab, setActiveTab] = useState<'profile' | 'new' | 'list' | 'manager' | 'manager_records' | 'manager_employees' | 'occurrences'>(() => {
     return (localStorage.getItem('activeTab') as any) || 'profile';
   });
@@ -1249,7 +1250,7 @@ function Logo({ className }: { className?: string }) {
 
 // --- Auth Page ---
 
-function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'login' | 'register', setView: (v: 'login' | 'register') => void, setUser: (u: User) => void, setIsPendingApproval: (v: boolean) => void }) {
+function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'login' | 'register' | 'forgot_password', setView: (v: 'login' | 'register' | 'forgot_password') => void, setUser: (u: User) => void, setIsPendingApproval: (v: boolean) => void }) {
   const [formData, setFormData] = useState({
     name: '',
     registration: '',
@@ -1345,7 +1346,7 @@ function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'log
                 onClick={() => setView('login')}
                 className={cn(
                   "flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all",
-                  view === 'login' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-white hover:bg-white/5"
+                  (view === 'login' || view === 'forgot_password') ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-white hover:bg-white/5"
                 )}
               >
                 Entrar
@@ -1375,7 +1376,43 @@ function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'log
             )}
 
             <div className="min-h-0">
-              {view === 'register' ? (
+              {view === 'forgot_password' ? (
+                <div className="py-2 space-y-6">
+                  <div className="flex flex-col items-center justify-center text-center space-y-4">
+                    <div className="w-16 h-16 bg-blue-500/10 rounded-3xl flex items-center justify-center text-blue-400">
+                      <ShieldAlert size={32} />
+                    </div>
+                    <div className="space-y-2 px-2">
+                      <h3 className="text-white font-bold text-lg">Esqueceu sua senha?</h3>
+                      <p className="text-slate-400 text-sm leading-relaxed">
+                        Por motivos de segurança, a redefinição de senha deve ser solicitada diretamente à nossa equipe técnica.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 bg-blue-600/20 rounded-xl flex items-center justify-center text-blue-400 shrink-0">
+                        <Users size={20} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Contato</p>
+                        <p className="text-white text-sm font-medium">Equipe de Infraestrutura</p>
+                        <p className="text-slate-500 text-xs mt-0.5">Disponível para suporte técnico e acessos</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button 
+                    type="button"
+                    onClick={() => setView('login')}
+                    className="w-full py-4 text-xs font-bold text-slate-500 hover:text-blue-400 uppercase tracking-widest transition-colors flex items-center justify-center gap-2"
+                  >
+                    <ChevronLeft size={14} />
+                    Voltar para o login
+                  </button>
+                </div>
+              ) : view === 'register' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <AuthInput 
                     icon={UserIcon}
@@ -1483,22 +1520,27 @@ function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'log
                   />
                   Lembrar-me
                 </label>
-                <button type="button" className="text-blue-400 hover:text-blue-300 transition-colors font-medium">
+                <button 
+                  type="button" 
+                  onClick={() => setView('forgot_password')}
+                  className="text-blue-400 hover:text-blue-300 transition-colors font-medium"
+                >
                   Esqueceu a senha?
                 </button>
               </div>
             )}
 
-            <div className="flex justify-center mt-2">
-              <Button 
-                type="submit" 
-                loading={loading}
-                className="w-full max-w-[220px] py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold text-base shadow-xl shadow-blue-600/20 transition-all active:scale-[0.98]"
-
-              >
-                {view === 'login' ? 'Entrar' : 'Criar Conta'}
-              </Button>
-            </div>
+            {view !== 'forgot_password' && (
+              <div className="flex justify-center mt-2">
+                <Button 
+                  type="submit" 
+                  loading={loading}
+                  className="w-full max-w-[220px] py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold text-base shadow-xl shadow-blue-600/20 transition-all active:scale-[0.98]"
+                >
+                  {view === 'login' ? 'Entrar' : 'Criar Conta'}
+                </Button>
+              </div>
+            )}
           </form>
         </div>
         
