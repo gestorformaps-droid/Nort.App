@@ -3135,20 +3135,20 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
             exit={{ opacity: 0, y: 10 }}
             className="absolute bottom-4 right-4 z-[2001]"
           >
-            <div className="flex flex-col gap-1.5 bg-slate-900/60 backdrop-blur-xl border border-white/20 p-2 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.4)]">
+            <div className="flex flex-col gap-2 bg-slate-900/70 backdrop-blur-xl border border-white/20 p-3.5 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.5)]">
               {[
-                  { label: 'Total', value: stats.total, color: '#0F172A', icon: <ClipboardList size={12} /> },
-                  { label: 'Concluídas', value: stats.completed, color: '#3B82F6', icon: <CheckCircle2 size={12} /> },
-                  { label: 'Em Andamento', value: stats.inProgress, color: '#EAB308', icon: <Clock size={12} /> },
-                  { label: 'Pausadas', value: stats.paused, color: '#F97316', icon: <AlertCircle size={12} /> },
-                  { label: 'Canceladas', value: stats.canceled, color: '#EF4444', icon: <XCircle size={12} /> },
+                  { label: 'Total', value: stats.total, color: '#0F172A', icon: <ClipboardList size={14} /> },
+                  { label: 'Concluídas', value: stats.completed, color: '#3B82F6', icon: <CheckCircle2 size={14} /> },
+                  { label: 'Em Andamento', value: stats.inProgress, color: '#EAB308', icon: <Clock size={14} /> },
+                  { label: 'Pausadas', value: stats.paused, color: '#F97316', icon: <AlertCircle size={14} /> },
+                  { label: 'Canceladas', value: stats.canceled, color: '#EF4444', icon: <XCircle size={14} /> },
               ].map((s) => (
-                <div key={s.label} className="flex items-center gap-2 px-1.5 py-1">
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center text-white shadow shrink-0" style={{ backgroundColor: s.color }}>
+                <div key={s.label} className="flex items-center gap-3 px-2 py-1.5">
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-white shadow-lg shrink-0" style={{ backgroundColor: s.color }}>
                     {s.icon}
                   </div>
-                  <span className="text-[10px] text-white/80 font-semibold w-20 leading-none">{s.label}</span>
-                  <span className="text-sm font-black text-white leading-none drop-shadow-sm min-w-[16px] text-right">{s.value}</span>
+                  <span className="text-[11px] text-white/90 font-bold w-24 leading-none uppercase tracking-wide">{s.label}</span>
+                  <span className="text-base font-black text-white leading-none drop-shadow-md min-w-[20px] text-right">{s.value}</span>
                 </div>
               ))}
             </div>
@@ -3157,7 +3157,7 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
 
         {/* Hovered Activity Overlay (Top Right Free Panel) */}
         {isMapFullscreen && (
-          <div className="absolute top-4 right-4 z-[2001] w-[calc(100%-32px)] sm:w-[320px] pointer-events-none space-y-3">
+          <div className="absolute top-4 right-4 z-[2001] w-[calc(100%-32px)] sm:w-[280px] pointer-events-none space-y-3">
             <AnimatePresence>
               {hoveredActivity && (
                 <motion.div
@@ -3171,18 +3171,18 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
                     className="h-1.5 w-full shadow-[0_0_10px_rgba(0,0,0,0.2)]" 
                     style={{ backgroundColor: STATUS_COLORS[hoveredActivity.status] }} 
                   />
-                  <div className="p-4">
+                  <div className="p-3">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest leading-none outline-none ring-0 border-none">{hoveredActivity.om_number}</span>
+                      <span className="text-[9px] font-bold text-white/50 uppercase tracking-widest leading-none outline-none ring-0 border-none">{hoveredActivity.om_number}</span>
                       <div 
-                        className="px-2 py-0.5 rounded-md text-[9px] font-extrabold text-white uppercase tracking-tighter shadow-sm"
+                        className="px-2 py-0.5 rounded-md text-[8px] font-extrabold text-white uppercase tracking-tighter shadow-sm"
                         style={{ backgroundColor: STATUS_COLORS[hoveredActivity.status] }}
                       >
                         {hoveredActivity.status}
                       </div>
                     </div>
                     
-                    <h4 className="font-extrabold text-white text-[14px] sm:text-[15px] leading-tight mb-3 sm:mb-4 drop-shadow-sm">{hoveredActivity.operation}</h4>
+                    <h4 className="font-extrabold text-white text-[13px] sm:text-[14px] leading-tight mb-2 drop-shadow-sm">{hoveredActivity.operation}</h4>
                     
                     <div className="space-y-3 sm:space-y-4 mt-2 pt-3 sm:pt-4 border-t border-white/10">
                       <div className="flex items-start gap-3">
@@ -3257,19 +3257,19 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
                 })}
               >
                 <Popup closeButton={false}>
-                  <div className="bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-0 min-w-[220px] font-sans overflow-hidden">
-                    <div className="p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{act.om_number}</span>
+                  <div className="bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-0 min-w-[200px] font-sans overflow-hidden">
+                    <div className="p-3">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[9px] font-bold text-white/40 uppercase tracking-widest">{act.om_number}</span>
                         <div 
-                          className="px-2 py-0.5 rounded-md text-[9px] font-extrabold text-white uppercase tracking-tighter"
+                          className="px-2 py-0.5 rounded-md text-[8px] font-extrabold text-white uppercase tracking-tighter"
                           style={{ backgroundColor: STATUS_COLORS[act.status] }}
                         >
                           {act.status}
                         </div>
                       </div>
                       
-                      <h4 className="font-extrabold text-white text-[14px] leading-tight mb-3 pr-2">{act.operation}</h4>
+                      <h4 className="font-extrabold text-white text-[13px] leading-tight mb-2 pr-2">{act.operation}</h4>
                       
                       <div className="space-y-3 mt-2 pt-3 border-t border-white/10">
                         <div className="flex items-start gap-2.5">
