@@ -2466,6 +2466,7 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
     serviceCode: '',
     search: ''
   });
+  const [showCodeFilterList, setShowCodeFilterList] = useState(false);
   const [justificationModal, setJustificationModal] = useState<{ id: number, status: ActivityStatus } | null>(null);
   const [justification, setJustification] = useState('');
   const [loading, setLoading] = useState(false);
@@ -2559,8 +2560,8 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
     <div className="space-y-4 lg:space-y-6">
       {/* Filters */}
       <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
-          <div className="lg:col-span-2 space-y-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
+          <div className="lg:col-span-6 space-y-1">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Busca</label>
             <div className="relative">
               <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -2574,7 +2575,7 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
             </div>
           </div>
           
-          <div className="space-y-1">
+          <div className="lg:col-span-2 space-y-1">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Data</label>
             <div className="relative">
               <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
@@ -2587,26 +2588,58 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
             </div>
           </div>
 
-          <div className="space-y-1">
+          <div className="lg:col-span-3 space-y-1 relative">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Cód. Serviço</label>
-            <select 
-              value={filters.serviceCode}
-              onChange={e => setFilters({ ...filters, serviceCode: e.target.value })}
-              className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+            <div 
+              className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
+              onClick={() => setShowCodeFilterList(!showCodeFilterList)}
             >
-              <option value="">Todos</option>
-              {OM_CODES.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
+              <span className="truncate">{filters.serviceCode || 'Todos'}</span>
+              <ChevronDown size={16} className="text-slate-400 ml-2 shrink-0 mr-1" />
+            </div>
+            
+            {showCodeFilterList && (
+              <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
+                <button
+                  type="button"
+                  className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setFilters({...filters, serviceCode: ''});
+                    setShowCodeFilterList(false);
+                  }}
+                >
+                  <span className="text-sm text-slate-900">Todos</span>
+                  {!filters.serviceCode && <CheckCircle2 size={14} className="text-blue-500" />}
+                </button>
+                {OM_CODES.map(code => (
+                  <button
+                    key={code}
+                    type="button"
+                    className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFilters({...filters, serviceCode: code});
+                      setShowCodeFilterList(false);
+                    }}
+                  >
+                    <span className="text-sm text-slate-900">{code}</span>
+                    {filters.serviceCode === code && <CheckCircle2 size={14} className="text-blue-500" />}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          <Button variant="outline" className="h-[42px] px-3 shrink-0" onClick={() => setFilters({
-            startDate: getBrasiliaDateString(),
-            endDate: getBrasiliaDateString(),
-            serviceCode: '',
-            search: ''
-          })}>
-            <X size={16} /> Limpar
-          </Button>
+          <div className="lg:col-span-1">
+            <Button variant="outline" className="h-[42px] w-full px-0 border-slate-200 hover:bg-slate-50" onClick={() => setFilters({
+              startDate: getBrasiliaDateString(),
+              serviceCode: '',
+              search: ''
+            })}>
+              <X size={16} />
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -3396,6 +3429,8 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
     status: '',
     search: ''
   });
+  const [showCodeFilterList, setShowCodeFilterList] = useState(false);
+  const [showStatusFilterList, setShowStatusFilterList] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [selectedEmployee, setSelectedEmployee] = useState<User | null>(null);
   const [history, setHistory] = useState<StatusHistory[]>([]);
