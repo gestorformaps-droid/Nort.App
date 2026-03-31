@@ -726,7 +726,7 @@ export default function App() {
     setIsMobileMenuOpen(false);
   };
 
-  if (isPendingApproval) {
+  if (isPendingApproval || view === 'forgot_password') {
     return (
       <div className="min-h-screen bg-[#00153D] flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
         <div className="fixed inset-0 bg-gradient-to-b from-[#1A3A8A] via-[#00153D] to-[#000B26] -z-10" />
@@ -738,20 +738,30 @@ export default function App() {
           <div className="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
             <Clock className="text-blue-400" size={40} />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-3 tracking-tight">Aguardando Aprovação</h1>
+          <h1 className="text-2xl font-bold text-white mb-3 tracking-tight">
+            {isPendingApproval ? "Aguardando Aprovação" : "Esqueceu sua senha?"}
+          </h1>
           <p className="text-slate-400 text-sm mb-8 leading-relaxed">
-            Seu perfil de gestor foi criado com sucesso! Por motivos de segurança, 
-            um administrador precisa liberar seu acesso antes de você começar.
+            {isPendingApproval 
+              ? "Seu perfil de gestor foi criado com sucesso! Por motivos de segurança, um administrador precisa liberar seu acesso antes de você começar."
+              : "Por motivos de segurança, a redefinição de senha deve ser solicitada diretamente à nossa equipe técnica."
+            }
           </p>
           <div className="bg-blue-900/20 border border-blue-500/20 p-4 rounded-2xl mb-8">
             <p className="text-xs text-blue-300">
-              Entre em contato com o responsável pelo sistema para solicitar a liberação do seu acesso.
+              {isPendingApproval
+                ? "Entre em contato com o responsável pelo sistema para solicitar a liberação do seu acesso."
+                : "Entre em contato com o responsável pelo sistema para solicitar a alteração de senha."
+              }
             </p>
           </div>
           <Button 
             variant="outline" 
-            onClick={() => setIsPendingApproval(false)}
-            className="w-full border-white/10 text-white hover:bg-white/10 h-12 rounded-xl"
+            onClick={() => {
+              setIsPendingApproval(false);
+              setView('login');
+            }}
+            className="w-full border-white/10 text-white hover:bg-white/10 h-12 rounded-xl text-base font-bold transition-all active:scale-[0.98]"
           >
             Voltar para o Login
           </Button>
@@ -760,7 +770,7 @@ export default function App() {
     );
   }
 
-  if (view === 'login' || view === 'register' || view === 'forgot_password') {
+  if (view === 'login' || view === 'register') {
     return <AuthPage view={view} setView={setView} setIsPendingApproval={setIsPendingApproval} setUser={(u) => {
       if (u.role === 'manager' && !u.is_active) {
         setIsPendingApproval(true);
@@ -1250,7 +1260,7 @@ function Logo({ className }: { className?: string }) {
 
 // --- Auth Page ---
 
-function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'login' | 'register' | 'forgot_password', setView: (v: 'login' | 'register' | 'forgot_password') => void, setUser: (u: User) => void, setIsPendingApproval: (v: boolean) => void }) {
+function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'login' | 'register', setView: (v: 'login' | 'register' | 'forgot_password') => void, setUser: (u: User) => void, setIsPendingApproval: (v: boolean) => void }) {
   const [formData, setFormData] = useState({
     name: '',
     registration: '',
@@ -1328,7 +1338,7 @@ function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'log
           animate={{ opacity: 1, y: 0 }}
           className={cn(
             "w-full transition-all duration-500 z-10",
-            (view === 'login' || view === 'forgot_password') ? "max-w-[340px]" : "max-w-[340px] md:max-w-[540px]"
+            view === 'login' ? "max-w-[340px]" : "max-w-[340px] md:max-w-[540px]"
           )}
         >
         <div className="bg-white/5 backdrop-blur-2xl rounded-[32px] border border-white/10 shadow-2xl overflow-hidden">
@@ -1340,30 +1350,28 @@ function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'log
             <p className="text-blue-400/60 text-xs font-medium mt-1">Inteligência Operacional</p>
           </div>
 
-          {view !== 'forgot_password' && (
-            <div className="px-6 pt-2">
-              <div className="bg-white/5 p-1 rounded-xl flex items-center gap-1">
-                <button 
-                  onClick={() => setView('login')}
-                  className={cn(
-                    "flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all",
-                    view === 'login' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-white hover:bg-white/5"
-                  )}
-                >
-                  Entrar
-                </button>
-                <button 
-                  onClick={() => setView('register')}
-                  className={cn(
-                    "flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all",
-                    view === 'register' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-white hover:bg-white/5"
-                  )}
-                >
-                  Cadastrar
-                </button>
-              </div>
+          <div className="px-6 pt-2">
+            <div className="bg-white/5 p-1 rounded-xl flex items-center gap-1">
+              <button 
+                onClick={() => setView('login')}
+                className={cn(
+                  "flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all",
+                  view === 'login' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-white hover:bg-white/5"
+                )}
+              >
+                Entrar
+              </button>
+              <button 
+                onClick={() => setView('register')}
+                className={cn(
+                  "flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all",
+                  view === 'register' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-white hover:bg-white/5"
+                )}
+              >
+                Cadastrar
+              </button>
             </div>
-          )}
+          </div>
           
           <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto max-h-[80dvh]">
             {error && (
@@ -1378,34 +1386,7 @@ function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'log
             )}
 
             <div className="min-h-0">
-              {view === 'forgot_password' ? (
-                <div className="py-4 space-y-8 text-center animate-in fade-in zoom-in duration-500">
-                  <div className="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
-                    <Clock className="text-blue-400" size={40} />
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <h1 className="text-2xl font-bold text-white tracking-tight">Esqueceu sua senha?</h1>
-                    <p className="text-slate-400 text-sm leading-relaxed px-4">
-                      Por motivos de segurança, a redefinição de senha deve ser solicitada diretamente à nossa equipe técnica.
-                    </p>
-                  </div>
-
-                  <div className="bg-blue-900/20 border border-blue-500/20 p-4 rounded-2xl mb-8">
-                    <p className="text-xs text-blue-300 leading-relaxed font-medium">
-                      Entre em contato com o responsável pelo sistema para solicitar a alteração de senha.
-                    </p>
-                  </div>
-
-                  <Button 
-                    variant="outline"
-                    onClick={() => setView('login')}
-                    className="w-full border-white/10 text-white hover:bg-white/10 h-12 rounded-xl"
-                  >
-                    Voltar para o Login
-                  </Button>
-                </div>
-              ) : view === 'register' ? (
+              {view === 'register' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <AuthInput 
                     icon={UserIcon}
@@ -1523,17 +1504,15 @@ function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'log
               </div>
             )}
 
-            {view !== 'forgot_password' && (
-              <div className="flex justify-center mt-2">
-                <Button 
-                  type="submit" 
-                  loading={loading}
-                  className="w-full max-w-[220px] py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold text-base shadow-xl shadow-blue-600/20 transition-all active:scale-[0.98]"
-                >
-                  {view === 'login' ? 'Entrar' : 'Criar Conta'}
-                </Button>
-              </div>
-            )}
+            <div className="flex justify-center mt-2">
+              <Button 
+                type="submit" 
+                loading={loading}
+                className="w-full max-w-[220px] py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold text-base shadow-xl shadow-blue-600/20 transition-all active:scale-[0.98]"
+              >
+                {view === 'login' ? 'Entrar' : 'Criar Conta'}
+              </Button>
+            </div>
           </form>
         </div>
         
