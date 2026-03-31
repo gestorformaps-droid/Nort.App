@@ -2463,7 +2463,6 @@ function DashboardNewRecordView({ user, locations, employees, onSuccess }: { use
 function DashboardActivityListView({ activities, employees, occurrences, user, onUpdate, onTabChange }: { activities: Activity[], employees: User[], occurrences: Occurrence[], user: User | null, onUpdate: () => void, onTabChange: (tab: any) => void }) {
   const [filters, setFilters] = useState({
     startDate: getBrasiliaDateString(),
-    endDate: getBrasiliaDateString(),
     serviceCode: '',
     search: ''
   });
@@ -2502,7 +2501,7 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
   const filteredActivities = activities.filter(a => {
     const date = parseISO(a.created_at);
     const start = startOfDay(parseISO(filters.startDate));
-    const end = endOfDay(parseISO(filters.endDate));
+    const end = endOfDay(parseISO(filters.startDate));
     
     const dateMatch = isWithinInterval(date, { start, end });
     const codeMatch = !filters.serviceCode || a.code === filters.serviceCode;
@@ -2559,24 +2558,24 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
   return (
     <div className="space-y-4 lg:space-y-6">
       {/* Filters */}
-      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div className="flex-1 space-y-1">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Busca</label>
-          <div className="relative">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input 
-              type="text"
-              placeholder="Buscar por OM ou Operação..."
-              value={filters.search}
-              onChange={(e) => setFilters({...filters, search: e.target.value})}
-              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
-            />
+      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+          <div className="lg:col-span-2 space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Busca</label>
+            <div className="relative">
+              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input 
+                type="text"
+                placeholder="Buscar por OM ou Operação..."
+                value={filters.search}
+                onChange={(e) => setFilters({...filters, search: e.target.value})}
+                className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+              />
+            </div>
           </div>
-        </div>
-        
-        <div className="grid grid-cols-2 lg:flex gap-3 items-end">
+          
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Início</label>
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Data</label>
             <div className="relative">
               <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
               <input 
@@ -2587,19 +2586,8 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
               />
             </div>
           </div>
+
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Fim</label>
-            <div className="relative">
-              <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
-              <input 
-                type="date"
-                value={filters.endDate}
-                onChange={e => setFilters({...filters, endDate: e.target.value})}
-                className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px]"
-              />
-            </div>
-          </div>
-          <div className="space-y-1 min-w-[120px]">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Cód. Serviço</label>
             <select 
               value={filters.serviceCode}
@@ -2610,13 +2598,14 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
               {OM_CODES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
+
           <Button variant="outline" className="h-[42px] px-3 shrink-0" onClick={() => setFilters({
             startDate: getBrasiliaDateString(),
             endDate: getBrasiliaDateString(),
             serviceCode: '',
             search: ''
           })}>
-            <X size={16} />
+            <X size={16} /> Limpar
           </Button>
         </div>
       </div>
@@ -3555,7 +3544,7 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
     <div className="space-y-4 lg:space-y-8">
       {/* Filters */}
       <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
           <div className="lg:col-span-2 space-y-1">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Busca</label>
             <div className="relative">
@@ -3570,25 +3559,13 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
             </div>
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Início</label>
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Data</label>
             <div className="relative">
               <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
               <input 
                 type="date"
                 value={filters.startDate}
                 onChange={e => setFilters({...filters, startDate: e.target.value})}
-                className="w-full pl-8 pr-1 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px]"
-              />
-            </div>
-          </div>
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Fim</label>
-            <div className="relative">
-              <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
-              <input 
-                type="date"
-                value={filters.endDate}
-                onChange={e => setFilters({...filters, endDate: e.target.value})}
                 className="w-full pl-8 pr-1 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px]"
               />
             </div>
@@ -3625,7 +3602,6 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
               className="h-[42px] border-slate-200 hover:bg-slate-50 transition-colors px-3 shrink-0" 
               onClick={() => setFilters({
                 startDate: getBrasiliaDateString(),
-                endDate: getBrasiliaDateString(),
                 serviceCode: '',
                 status: '',
                 search: ''
