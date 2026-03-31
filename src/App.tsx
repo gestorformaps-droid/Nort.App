@@ -3139,20 +3139,20 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
             exit={{ opacity: 0, y: 10 }}
             className="absolute bottom-4 right-4 z-[2001]"
           >
-            <div className="flex flex-col gap-2 bg-slate-900/70 backdrop-blur-xl border border-white/20 p-3.5 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.5)]">
+            <div className="flex flex-col gap-1.5 bg-slate-900/70 backdrop-blur-xl border border-white/20 p-2.5 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.5)]">
               {[
-                  { label: 'Total', value: stats.total, color: '#0F172A', icon: <ClipboardList size={14} /> },
-                  { label: 'Concluídas', value: stats.completed, color: '#3B82F6', icon: <CheckCircle2 size={14} /> },
-                  { label: 'Em Andamento', value: stats.inProgress, color: '#EAB308', icon: <Clock size={14} /> },
-                  { label: 'Pausadas', value: stats.paused, color: '#F97316', icon: <AlertCircle size={14} /> },
-                  { label: 'Canceladas', value: stats.canceled, color: '#EF4444', icon: <XCircle size={14} /> },
+                  { label: 'Total', value: stats.total, color: '#0F172A', icon: <ClipboardList size={13} /> },
+                  { label: 'Concluídas', value: stats.completed, color: '#3B82F6', icon: <CheckCircle2 size={13} /> },
+                  { label: 'Em Andamento', value: stats.inProgress, color: '#EAB308', icon: <Clock size={13} /> },
+                  { label: 'Pausadas', value: stats.paused, color: '#F97316', icon: <AlertCircle size={13} /> },
+                  { label: 'Canceladas', value: stats.canceled, color: '#EF4444', icon: <XCircle size={13} /> },
               ].map((s) => (
-                <div key={s.label} className="flex items-center gap-3 px-2 py-1.5">
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-white shadow-lg shrink-0" style={{ backgroundColor: s.color }}>
+                <div key={s.label} className="flex items-center gap-2.5 px-1.5 py-1">
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-white shadow-lg shrink-0" style={{ backgroundColor: s.color }}>
                     {s.icon}
                   </div>
-                  <span className="text-[11px] text-white/90 font-bold w-24 leading-none uppercase tracking-wide">{s.label}</span>
-                  <span className="text-base font-black text-white leading-none drop-shadow-md min-w-[20px] text-right">{s.value}</span>
+                  <span className="text-[10px] text-white/90 font-bold w-22 leading-none uppercase tracking-wide">{s.label}</span>
+                  <span className="text-sm font-black text-white leading-none drop-shadow-md min-w-[18px] text-right">{s.value}</span>
                 </div>
               ))}
             </div>
