@@ -581,10 +581,18 @@ export default function App() {
 
       const results = await Promise.all(promises);
       
-      // If user check fails with 404, logout immediately
-      if (user?.id && results[4] && results[4].status === 404) {
-        handleLogout();
-        return;
+      if (user?.id && results[4]) {
+        if (results[4].status === 404) {
+          handleLogout();
+          return;
+        }
+        const updatedUser = await results[4].json();
+        // Single session check
+        if (user.current_session_id && updatedUser.current_session_id && updatedUser.current_session_id !== user.current_session_id) {
+          console.warn("Sessão invalidada: Outro login detectado.");
+          handleLogout();
+          return;
+        }
       }
 
       const [actRes, locRes, empRes, occRes] = results;
@@ -1055,10 +1063,10 @@ export default function App() {
         </header>
 
         <div className={cn(
-          "flex-1 flex flex-col min-h-0 w-full max-w-[1440px] mx-auto",
+          "flex-1 flex flex-col min-h-0 w-full mx-auto",
           activeTab === 'manager'
-            ? "overflow-hidden p-2 sm:p-3 lg:p-5"
-            : "overflow-y-auto p-2 sm:p-3 lg:p-6 no-scrollbar"
+            ? "max-w-none px-4 lg:px-8 overflow-hidden py-2 sm:py-3 lg:py-5"
+            : "max-w-[1440px] px-2 sm:px-3 lg:px-6 overflow-y-auto no-scrollbar py-2 sm:py-3 lg:py-6"
         )}>
           <ErrorBoundary>
             <AnimatePresence mode="wait" initial={false}>
@@ -2929,7 +2937,7 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
   }), [filteredActivities]);
 
   return (
-    <div className="lg:grid lg:grid-cols-[340px_1fr] lg:gap-4 flex flex-col gap-3 h-full min-h-0">
+    <div className="lg:grid lg:grid-cols-[360px_1fr] lg:gap-6 2xl:gap-8 flex flex-col gap-3 h-full min-h-0">
 
       {/* LEFT COLUMN: Filtros + Stats */}
       <div className="flex flex-col gap-2 lg:overflow-y-auto lg:no-scrollbar min-h-0">

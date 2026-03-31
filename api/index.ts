@@ -56,11 +56,15 @@ app.post("/api/auth/login", async (req, res) => {
   if (registration?.length !== 6 || password?.length !== 8) {
     return res.status(400).json({ error: "Matrícula deve ter 6 dígitos e Senha deve ter 8 dígitos" });
   }
+  
+  const sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
   const { data: user, error } = await supabase
     .from("users")
-    .select("*")
+    .update({ current_session_id: sessionId })
     .eq("registration", registration)
     .eq("password", password)
+    .select()
     .single();
 
   if (user) {
@@ -71,7 +75,8 @@ app.post("/api/auth/login", async (req, res) => {
       ...user, 
       is_active: !!user.is_active,
       training_list: safeParseJSON(user.trainings),
-      avatar_url: user.avatar_url || null
+      avatar_url: user.avatar_url || null,
+      current_session_id: sessionId
     });
   } else {
     res.status(401).json({ error: "Credenciais inválidas" });
@@ -85,6 +90,8 @@ app.post("/api/auth/register", async (req, res) => {
     return res.status(400).json({ error: "Matrícula deve ter 6 dígitos e Senha deve ter 8 dígitos" });
   }
   
+  const sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
   const { data: newUser, error } = await supabase
     .from("users")
     .insert({
@@ -97,7 +104,8 @@ app.post("/api/auth/register", async (req, res) => {
       phone: phone || '', 
       trainings: Array.isArray(trainings) ? trainings : (typeof trainings === 'string' ? safeParseJSON(trainings) : []), 
       is_active: false, 
-      avatar_url: avatar_url || null
+      avatar_url: avatar_url || null,
+      current_session_id: sessionId
     })
     .select()
     .single();
@@ -114,7 +122,8 @@ app.post("/api/auth/register", async (req, res) => {
     is_active: !!newUser.is_active,
     training_list: safeParseJSON(newUser.trainings),
     avatar_url: newUser.avatar_url || null,
-    avatar_position: newUser.avatar_position || 'center'
+    avatar_position: newUser.avatar_position || 'center',
+    current_session_id: sessionId
   });
 });
 
