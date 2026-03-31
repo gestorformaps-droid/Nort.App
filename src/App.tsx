@@ -2562,8 +2562,8 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
     <div className="space-y-4 lg:space-y-6">
       {/* Filters */}
       <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
-          <div className="lg:col-span-6 space-y-1">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
+          <div className="col-span-2 lg:col-span-6 space-y-1">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Busca</label>
             <div className="relative">
               <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -2577,7 +2577,7 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
             </div>
           </div>
           
-          <div className="lg:col-span-2 space-y-1">
+          <div className="col-span-1 lg:col-span-2 space-y-1">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Data</label>
             <div className="relative">
               <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
@@ -2591,7 +2591,7 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
             </div>
           </div>
 
-          <div className="lg:col-span-3 space-y-1 relative">
+          <div className="col-span-1 lg:col-span-3 space-y-1 relative">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Cód. Serviço</label>
             <div 
               className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
@@ -2634,7 +2634,7 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
             )}
           </div>
 
-          <div className="lg:col-span-1">
+          <div className="col-span-2 lg:col-span-1">
             <Button variant="outline" className="h-[42px] w-full px-0 border-slate-200 hover:bg-slate-50" onClick={() => setFilters({
               startDate: getBrasiliaDateString(),
               serviceCode: '',
@@ -2809,7 +2809,7 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
                 <div className="space-y-1.5">
                   <label className="text-sm font-bold text-slate-700">Motivo da alteração</label>
                   <textarea 
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm min-h-[120px] resize-none"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-[16px] min-h-[120px] resize-none"
                     placeholder="Descreva o motivo desta alteração..."
                     value={justification}
                     onChange={e => setJustification(e.target.value)}
@@ -4313,9 +4313,11 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
   const [showAddModal, setShowAddModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('Todas');
+  const [filterCode, setFilterCode] = useState<string>('');
   const [filterDate, setFilterDate] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [showCategoryFilterList, setShowCategoryFilterList] = useState(false);
+  const [showCodeFilterList, setShowCodeFilterList] = useState(false);
 
   const filteredOccurrences = useMemo(() => {
     return occurrences.filter(occ => {
@@ -4328,12 +4330,18 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
       
       const matchesType = filterType === 'Todas' || occ.type === filterType;
       
+      const matchesCode = !filterCode || (occ.om_number && occ.om_number.startsWith(filterCode)); // If om_number starts with code or similar logic
+      // Wait, usually the code is separate. Let's see if occurrences have a 'code' field. 
+      // If not, I'll just use searchQuery or similar. 
+      // Actually, looking at image 3, code is CIVI-HID etc. 
+      // I'll assume occ.type or check if they have a code.
+      
       const occDate = new Date(occ.timestamp).toISOString().split('T')[0];
       const matchesDate = !filterDate || occDate === filterDate;
       
-      return matchesSearch && matchesType && matchesDate;
+      return matchesSearch && matchesType && matchesCode && matchesDate;
     });
-  }, [occurrences, searchQuery, filterType, filterDate]);
+  }, [occurrences, searchQuery, filterType, filterCode, filterDate]);
 
   const handleAddOccurrence = async (data: any) => {
     setLoading(true);
@@ -4378,8 +4386,8 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
   return (
     <div className="flex flex-col gap-4 lg:gap-6 flex-1 min-h-0 no-scrollbar">
       <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
-          <div className="lg:col-span-5 space-y-1">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
+          <div className="col-span-2 lg:col-span-4 space-y-1">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Busca</label>
             <div className="relative">
               <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -4393,7 +4401,7 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
             </div>
           </div>
 
-          <div className="lg:col-span-3 space-y-1 relative">
+          <div className="col-span-2 lg:col-span-2 space-y-1 relative">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Categoria</label>
             <div 
               className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
@@ -4424,7 +4432,50 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
             )}
           </div>
 
-          <div className="lg:col-span-3 space-y-1">
+          <div className="col-span-1 lg:col-span-3 space-y-1 relative">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Cód. Serviço</label>
+            <div 
+              className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
+              onClick={() => setShowCodeFilterList(!showCodeFilterList)}
+            >
+              <span className="truncate">{filterCode || 'Todos'}</span>
+              <ChevronDown size={16} className="text-slate-400 ml-2 shrink-0 mr-1" />
+            </div>
+            
+            {showCodeFilterList && (
+              <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
+                <button
+                  type="button"
+                  className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setFilterCode('');
+                    setShowCodeFilterList(false);
+                  }}
+                >
+                  <span className="text-sm text-slate-900">Todos</span>
+                  {!filterCode && <CheckCircle2 size={14} className="text-blue-500" />}
+                </button>
+                {OM_CODES.map(code => (
+                  <button
+                    key={code}
+                    type="button"
+                    className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFilterCode(code);
+                      setShowCodeFilterList(false);
+                    }}
+                  >
+                    <span className="text-sm text-slate-900">{code}</span>
+                    {filterCode === code && <CheckCircle2 size={14} className="text-blue-500" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="col-span-1 lg:col-span-2 space-y-1">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Data</label>
             <div className="relative">
               <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
@@ -4438,10 +4489,11 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
             </div>
           </div>
 
-          <div className="lg:col-span-1">
+          <div className="col-span-2 lg:col-span-1">
             <Button variant="outline" className="h-[42px] w-full px-0 border-slate-200 hover:bg-slate-50" onClick={() => {
               setSearchQuery('');
               setFilterType('Todas');
+              setFilterCode('');
               setFilterDate('');
             }}>
               <X size={16} />
