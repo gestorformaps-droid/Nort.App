@@ -1340,28 +1340,30 @@ function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'log
             <p className="text-blue-400/60 text-xs font-medium mt-1">Inteligência Operacional</p>
           </div>
 
-          <div className="px-6 pt-2">
-            <div className="bg-white/5 p-1 rounded-xl flex items-center gap-1">
-              <button 
-                onClick={() => setView('login')}
-                className={cn(
-                  "flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all",
-                  (view === 'login' || view === 'forgot_password') ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-white hover:bg-white/5"
-                )}
-              >
-                Entrar
-              </button>
-              <button 
-                onClick={() => setView('register')}
-                className={cn(
-                  "flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all",
-                  view === 'register' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-white hover:bg-white/5"
-                )}
-              >
-                Cadastrar
-              </button>
+          {view !== 'forgot_password' && (
+            <div className="px-6 pt-2">
+              <div className="bg-white/5 p-1 rounded-xl flex items-center gap-1">
+                <button 
+                  onClick={() => setView('login')}
+                  className={cn(
+                    "flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all",
+                    view === 'login' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-white hover:bg-white/5"
+                  )}
+                >
+                  Entrar
+                </button>
+                <button 
+                  onClick={() => setView('register')}
+                  className={cn(
+                    "flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all",
+                    view === 'register' ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-400 hover:text-white hover:bg-white/5"
+                  )}
+                >
+                  Cadastrar
+                </button>
+              </div>
             </div>
-          </div>
+          )}
           
           <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto max-h-[80dvh]">
             {error && (
@@ -1377,40 +1379,30 @@ function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'log
 
             <div className="min-h-0">
               {view === 'forgot_password' ? (
-                <div className="py-2 space-y-6">
-                  <div className="flex flex-col items-center justify-center text-center space-y-4">
-                    <div className="w-16 h-16 bg-blue-500/10 rounded-3xl flex items-center justify-center text-blue-400">
-                      <ShieldAlert size={32} />
-                    </div>
-                    <div className="space-y-2 px-2">
-                      <h3 className="text-white font-bold text-lg">Esqueceu sua senha?</h3>
-                      <p className="text-slate-400 text-sm leading-relaxed">
-                        Por motivos de segurança, a redefinição de senha deve ser solicitada diretamente à nossa equipe técnica.
-                      </p>
-                    </div>
+                <div className="py-4 space-y-8 text-center animate-in fade-in zoom-in duration-500">
+                  <div className="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+                    <Clock className="text-blue-400" size={40} />
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <h1 className="text-2xl font-bold text-white tracking-tight">Esqueceu sua senha?</h1>
+                    <p className="text-slate-400 text-sm leading-relaxed px-4">
+                      Por motivos de segurança, a redefinição de senha deve ser solicitada diretamente à nossa equipe técnica.
+                    </p>
                   </div>
 
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
-                    <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 bg-blue-600/20 rounded-xl flex items-center justify-center text-blue-400 shrink-0">
-                        <Users size={20} />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Contato</p>
-                        <p className="text-white text-sm font-medium">Equipe de Infraestrutura</p>
-                        <p className="text-slate-500 text-xs mt-0.5">Disponível para suporte técnico e acessos</p>
-                      </div>
-                    </div>
+                  <div className="bg-blue-900/20 border border-blue-500/20 p-5 rounded-[24px]">
+                    <p className="text-xs text-blue-300 leading-relaxed font-medium">
+                      Entre em contato com o responsável pelo sistema para solicitar a liberação do seu acesso.
+                    </p>
                   </div>
 
-                  <button 
-                    type="button"
+                  <Button 
                     onClick={() => setView('login')}
-                    className="w-full py-4 text-xs font-bold text-slate-500 hover:text-blue-400 uppercase tracking-widest transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[20px] font-bold text-base transition-all active:scale-[0.98]"
                   >
-                    <ChevronLeft size={14} />
-                    Voltar para o login
-                  </button>
+                    Voltar para o Login
+                  </Button>
                 </div>
               ) : view === 'register' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
