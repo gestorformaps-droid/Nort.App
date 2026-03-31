@@ -2462,7 +2462,7 @@ function DashboardNewRecordView({ user, locations, employees, onSuccess }: { use
 
 function DashboardActivityListView({ activities, employees, occurrences, user, onUpdate, onTabChange }: { activities: Activity[], employees: User[], occurrences: Occurrence[], user: User | null, onUpdate: () => void, onTabChange: (tab: any) => void }) {
   const [filters, setFilters] = useState({
-    startDate: getBrasiliaDateString(),
+    startDate: '',
     serviceCode: '',
     status: '',
     search: ''
@@ -2502,11 +2502,14 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
   };
 
   const filteredActivities = activities.filter(a => {
-    const date = parseISO(a.created_at);
-    const start = startOfDay(parseISO(filters.startDate));
-    const end = endOfDay(parseISO(filters.startDate));
+    let dateMatch = true;
+    if (filters.startDate) {
+      const date = parseISO(a.created_at);
+      const start = startOfDay(parseISO(filters.startDate));
+      const end = endOfDay(parseISO(filters.startDate));
+      dateMatch = isWithinInterval(date, { start, end });
+    }
     
-    const dateMatch = isWithinInterval(date, { start, end });
     const codeMatch = !filters.serviceCode || a.code === filters.serviceCode;
     const searchMatch = !filters.search || 
       a.operation?.toLowerCase().includes(filters.search.toLowerCase()) ||
@@ -2636,12 +2639,12 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
 
           <div className="col-span-2 lg:col-span-1">
             <Button variant="outline" className="h-[42px] w-full px-4 border-slate-200 hover:bg-slate-50 flex items-center justify-center gap-2" onClick={() => setFilters({
-              startDate: getBrasiliaDateString(),
+              startDate: '',
               serviceCode: '',
               search: ''
             })}>
               <X size={16} />
-              <span className="text-xs font-bold uppercase tracking-wider">Limpar</span>
+              <span className="text-xs font-bold uppercase tracking-widest">Limpar</span>
             </Button>
           </div>
         </div>
