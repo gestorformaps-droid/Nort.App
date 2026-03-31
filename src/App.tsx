@@ -2635,12 +2635,13 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
           </div>
 
           <div className="col-span-2 lg:col-span-1">
-            <Button variant="outline" className="h-[42px] w-full px-0 border-slate-200 hover:bg-slate-50" onClick={() => setFilters({
+            <Button variant="outline" className="h-[42px] w-full px-4 border-slate-200 hover:bg-slate-50 flex items-center justify-center gap-2" onClick={() => setFilters({
               startDate: getBrasiliaDateString(),
               serviceCode: '',
               search: ''
             })}>
               <X size={16} />
+              <span className="text-xs font-bold uppercase tracking-wider">Limpar</span>
             </Button>
           </div>
         </div>
@@ -4490,13 +4491,14 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
           </div>
 
           <div className="col-span-2 lg:col-span-1">
-            <Button variant="outline" className="h-[42px] w-full px-0 border-slate-200 hover:bg-slate-50" onClick={() => {
+            <Button variant="outline" className="h-[42px] w-full px-4 border-slate-200 hover:bg-slate-50 flex items-center justify-center gap-2" onClick={() => {
               setSearchQuery('');
               setFilterType('Todas');
               setFilterCode('');
               setFilterDate('');
             }}>
               <X size={16} />
+              <span className="text-xs font-bold uppercase tracking-wider">Limpar</span>
             </Button>
           </div>
         </div>
