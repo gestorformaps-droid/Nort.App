@@ -3074,12 +3074,12 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
         {/* Fullscreen Stats Overlay (Top Right Glass Pill) */}
         {isMapFullscreen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-14 right-4 z-[2001]"
+            exit={{ opacity: 0, y: 10 }}
+            className="absolute bottom-0 right-0 z-[2001]"
           >
-            <div className="flex flex-col gap-1.5 bg-slate-900/60 backdrop-blur-xl border border-white/20 p-2 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.4)]">
+            <div className="flex flex-col gap-1.5 bg-slate-900/60 backdrop-blur-xl border border-white/20 p-2 rounded-none shadow-[0_10px_30px_rgba(0,0,0,0.4)]">
               {[
                   { label: 'Total', value: stats.total, color: '#0F172A', icon: <ClipboardList size={12} /> },
                   { label: 'Concluídas', value: stats.completed, color: '#3B82F6', icon: <CheckCircle2 size={12} /> },
