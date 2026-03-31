@@ -3113,10 +3113,10 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
 
       {/* RIGHT COLUMN: Map */}
       <div className={cn(
-        "bg-white p-1.5 lg:p-2 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden transition-all duration-300 min-h-0",
+        "bg-slate-900 rounded-2xl shadow-sm relative overflow-hidden transition-all duration-300 min-h-0",
         isMapFullscreen
           ? "fixed inset-0 z-[2000] rounded-none border-0 p-0"
-          : "flex-1 lg:h-auto"
+          : "flex-1 lg:h-auto border border-slate-200"
       )}>
         {/* Expand / Collapse Button */}
         <button
@@ -3133,9 +3133,9 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="absolute bottom-0 right-0 z-[2001]"
+            className="absolute bottom-4 right-4 z-[2001]"
           >
-            <div className="flex flex-col gap-1.5 bg-slate-900/60 backdrop-blur-xl border border-white/20 p-2 rounded-none shadow-[0_10px_30px_rgba(0,0,0,0.4)]">
+            <div className="flex flex-col gap-1.5 bg-slate-900/60 backdrop-blur-xl border border-white/20 p-2 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.4)]">
               {[
                   { label: 'Total', value: stats.total, color: '#0F172A', icon: <ClipboardList size={12} /> },
                   { label: 'Concluídas', value: stats.completed, color: '#3B82F6', icon: <CheckCircle2 size={12} /> },
@@ -3256,52 +3256,52 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
                   iconAnchor: [9, 28]
                 })}
               >
-                {window.innerWidth < 1024 && (
-
-                  <Popup closeButton={false}>
-                    <div className="bg-white border-0 rounded-2xl shadow-2xl p-0 min-w-[240px] font-sans overflow-hidden">
-                      {/* Accent bar at top */}
-                      <div 
-                        className="h-1.5 w-full" 
-                        style={{ backgroundColor: STATUS_COLORS[act.status] }} 
-                      />
-                      <div className="p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{act.om_number}</span>
-                          <div 
-                            className="px-2 py-0.5 rounded-md text-[9px] font-extrabold text-white uppercase tracking-tighter"
-                            style={{ backgroundColor: STATUS_COLORS[act.status] }}
-                          >
-                            {act.status}
+                <Popup closeButton={false}>
+                  <div className="bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-0 min-w-[220px] font-sans overflow-hidden">
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{act.om_number}</span>
+                        <div 
+                          className="px-2 py-0.5 rounded-md text-[9px] font-extrabold text-white uppercase tracking-tighter"
+                          style={{ backgroundColor: STATUS_COLORS[act.status] }}
+                        >
+                          {act.status}
+                        </div>
+                      </div>
+                      
+                      <h4 className="font-extrabold text-white text-[14px] leading-tight mb-3 pr-2">{act.operation}</h4>
+                      
+                      <div className="space-y-3 mt-2 pt-3 border-t border-white/10">
+                        <div className="flex items-start gap-2.5">
+                          <div className="w-5 h-5 rounded-md bg-blue-500/20 flex items-center justify-center shrink-0">
+                            <MapPin size={10} className="text-blue-400" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[8px] text-white/30 font-bold uppercase tracking-wider mb-0.5">Localização</p>
+                            <p className="text-[11px] text-white font-semibold leading-tight truncate">{act.location_name || 'Desconhecido'}</p>
                           </div>
                         </div>
                         
-                        <h4 className="font-extrabold text-slate-900 text-sm leading-tight mb-3">{act.operation}</h4>
-                        
-                        <div className="space-y-3 mt-2 pt-3 border-t border-slate-100">
-                          <div className="flex items-start gap-2.5 text-slate-600">
-                            <MapPin size={14} className="shrink-0 text-blue-500 mt-0.5" />
-                            <span className="text-[11px] leading-snug font-semibold">{act.location_name || 'Local não identificado'}</span>
+                        <div className="flex items-start gap-2.5">
+                          <div className="w-5 h-5 rounded-md bg-emerald-500/20 flex items-center justify-center shrink-0">
+                            <Users size={10} className="text-emerald-400" />
                           </div>
-                          
-                          <div className="flex items-start gap-2.5 text-slate-600">
-                            <Users size={14} className="shrink-0 text-blue-500 mt-0.5" />
-                            <span className="text-[11px] leading-snug">
-                              <span className="font-bold text-slate-400 mr-1">Equipe:</span> {getInvolvedTeam(act)}
-                            </span>
+                          <div className="min-w-0">
+                            <p className="text-[8px] text-white/30 font-bold uppercase tracking-wider mb-0.5">Equipe Envolvida</p>
+                            <p className="text-[11px] text-white font-medium opacity-90 truncate">{getInvolvedTeam(act)}</p>
                           </div>
+                        </div>
 
-                          <div className="flex items-center gap-2 text-slate-400 mt-2 pt-1 border-t border-slate-50">
-                            <Clock size={12} className="shrink-0" />
-                            <span className="text-[10px] font-bold uppercase tracking-wider">
-                              {format(parseISO(act.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-                            </span>
-                          </div>
+                        <div className="flex items-center gap-2 text-white/30 mt-3 pt-2 border-t border-white/5">
+                          <Clock size={11} className="shrink-0" />
+                          <span className="text-[9px] font-bold uppercase tracking-widest">
+                            Registrado às {format(parseISO(act.created_at), "HH:mm", { locale: ptBR })}
+                          </span>
                         </div>
                       </div>
                     </div>
-                  </Popup>
-                )}
+                  </div>
+                </Popup>
               </Marker>
             ))}
             <MapResizer trigger={isMapFullscreen} />
