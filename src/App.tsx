@@ -1391,15 +1391,16 @@ function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'log
                     </p>
                   </div>
 
-                  <div className="bg-blue-900/20 border border-blue-500/20 p-5 rounded-[24px]">
+                  <div className="bg-blue-900/20 border border-blue-500/20 p-4 rounded-2xl mb-8">
                     <p className="text-xs text-blue-300 leading-relaxed font-medium">
                       Entre em contato com o responsável pelo sistema para solicitar a alteração de senha.
                     </p>
                   </div>
 
                   <Button 
+                    variant="outline"
                     onClick={() => setView('login')}
-                    className="w-full py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-[20px] font-bold text-base transition-all active:scale-[0.98]"
+                    className="w-full border-white/10 text-white hover:bg-white/10 h-12 rounded-xl"
                   >
                     Voltar para o Login
                   </Button>
