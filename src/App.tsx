@@ -1393,7 +1393,7 @@ function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'log
 
                   <div className="bg-blue-900/20 border border-blue-500/20 p-5 rounded-[24px]">
                     <p className="text-xs text-blue-300 leading-relaxed font-medium">
-                      Entre em contato com o responsável pelo sistema para solicitar a liberação do seu acesso.
+                      Entre em contato com o responsável pelo sistema para solicitar a alteração de senha.
                     </p>
                   </div>
 
