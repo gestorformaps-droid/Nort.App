@@ -760,7 +760,7 @@ export default function App() {
     );
   }
 
-  if (view === 'login' || view === 'register') {
+  if (view === 'login' || view === 'register' || view === 'forgot_password') {
     return <AuthPage view={view} setView={setView} setIsPendingApproval={setIsPendingApproval} setUser={(u) => {
       if (u.role === 'manager' && !u.is_active) {
         setIsPendingApproval(true);
