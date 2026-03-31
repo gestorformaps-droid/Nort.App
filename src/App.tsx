@@ -568,12 +568,26 @@ export default function App() {
   const fetchData = React.useCallback(async () => {
     setLoading(true);
     try {
-      const [actRes, locRes, empRes, occRes] = await Promise.all([
+      const promises: Promise<Response>[] = [
         fetch('/api/activities'),
         fetch('/api/locations'),
         fetch('/api/users'),
         fetch('/api/occurrences')
-      ]);
+      ];
+
+      if (user?.id) {
+        promises.push(fetch(`/api/users/${user.id}`));
+      }
+
+      const results = await Promise.all(promises);
+      
+      // If user check fails with 404, logout immediately
+      if (user?.id && results[4] && results[4].status === 404) {
+        handleLogout();
+        return;
+      }
+
+      const [actRes, locRes, empRes, occRes] = results;
       
       if (!actRes.ok || !locRes.ok || !empRes.ok || !occRes.ok) {
         throw new Error(`Fetch failed: ${actRes.status} ${locRes.status} ${empRes.status} ${occRes.status}`);
@@ -4121,7 +4135,8 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
         occ.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         occ.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         occ.user_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        occ.location.toLowerCase().includes(searchQuery.toLowerCase());
+        occ.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (occ.om_number && occ.om_number.toLowerCase().includes(searchQuery.toLowerCase()));
       
       const matchesType = filterType === 'Todas' || occ.type === filterType;
       

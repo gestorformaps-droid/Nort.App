@@ -184,7 +184,6 @@ app.patch("/api/users/:id/status", async (req, res) => {
   });
 });
 
-// Users Endpoints
 app.get("/api/users", async (req, res) => {
   const { data: users, error } = await supabase
     .from("users")
@@ -200,6 +199,27 @@ app.get("/api/users", async (req, res) => {
     avatar_url: u.avatar_url || null,
     avatar_position: u.avatar_position || 'center'
   })));
+});
+
+app.get("/api/users/:id", async (req, res) => {
+  const { id } = req.params;
+  const { data: user, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error || !user) {
+    return res.status(404).json({ error: "Usuário não encontrado" });
+  }
+
+  res.json({ 
+    ...user, 
+    is_active: !!user.is_active,
+    training_list: safeParseJSON(user.trainings),
+    avatar_url: user.avatar_url || null,
+    avatar_position: user.avatar_position || 'center'
+  });
 });
 
 // Locations Endpoints
