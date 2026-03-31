@@ -313,6 +313,8 @@ const getBrasiliaDateString = () => {
   }).format(new Date());
 };
 
+const roundCoord = (val: number) => Number(val.toFixed(6));
+
 // Fix Leaflet icon issue
 // @ts-ignore
 delete L.Icon.Default.prototype._getIconUrl;
@@ -1991,8 +1993,8 @@ function DashboardNewRecordView({ user, locations, employees, onSuccess }: { use
             // Só atualiza se for o primeiro ping OU se o novo ping tiver raio de precisão menor/igual
             if (!prev || acc <= prev.accuracy) {
               return {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
+                latitude: roundCoord(position.coords.latitude),
+                longitude: roundCoord(position.coords.longitude),
                 accuracy: acc
               };
             }
@@ -2082,7 +2084,7 @@ function DashboardNewRecordView({ user, locations, employees, onSuccess }: { use
     } else {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const { latitude, longitude } = position.coords;
-        await saveRecord(latitude, longitude);
+        await saveRecord(roundCoord(latitude), roundCoord(longitude));
       }, (err) => {
         let msg = 'Erro ao capturar geolocalização.';
         if (err.code === err.PERMISSION_DENIED) msg = 'Permissão de geolocalização negada. Por favor, habilite o acesso.';
@@ -3149,7 +3151,7 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-full sm:w-[380px] bg-white shadow-2xl z-[1001] flex flex-col border-l border-slate-200"
+            className="fixed top-0 right-0 h-full w-full sm:w-[380px] bg-white shadow-2xl z-[1100] flex flex-col border-l border-slate-200"
           >
             <button 
               onClick={() => setSelectedActivity(null)}
