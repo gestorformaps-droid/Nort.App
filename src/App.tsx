@@ -2583,7 +2583,8 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
                 type="date"
                 value={filters.startDate}
                 onChange={e => setFilters({...filters, startDate: e.target.value})}
-                className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px]"
+                onClick={(e) => (e.target as any).showPicker?.()}
+                className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px] cursor-pointer"
               />
             </div>
           </div>
@@ -2599,7 +2600,7 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
             </div>
             
             {showCodeFilterList && (
-              <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
+              <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
                 <button
                   type="button"
                   className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
@@ -2661,15 +2662,15 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
                       <span className="text-[9px] lg:text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase tracking-wider">
                         {activity.code}
                       </span>
-                      <h4 className="font-bold text-xs lg:text-base text-slate-900 truncate max-w-[200px] sm:max-w-none">
+                      <h4 className="font-bold text-[11px] lg:text-sm text-slate-900 truncate max-w-[200px] sm:max-w-none">
                         {activity.om_number} - {activity.operation}
                       </h4>
                     </div>
                     <div className="flex items-start justify-between gap-2 lg:gap-4 w-full">
-                      <p className="text-[10px] lg:text-xs text-slate-500 flex items-center gap-2 truncate">
+                      <p className="text-[9px] lg:text-[10px] text-slate-500 flex items-center gap-2 truncate">
                         <MapPin size={12} className="shrink-0" /> {activity.location_name}
                       </p>
-                      <div className="text-[10px] lg:text-xs text-slate-500 flex items-start gap-2 text-right shrink-0">
+                      <div className="text-[9px] lg:text-[10px] text-slate-500 flex items-start gap-2 text-right shrink-0">
                         <Clock size={12} className="mt-0.5 shrink-0" />
                         <div className="flex flex-col leading-tight">
                           <span className="font-medium">{format(parseISO(activity.created_at), 'dd/MM/yyyy')}</span>
@@ -2679,7 +2680,7 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
                     </div>
                     <div className="flex items-center gap-2 mt-1 overflow-hidden">
                       <Users size={12} className="text-slate-400 shrink-0" />
-                      <p className="text-[9px] lg:text-[10px] font-medium text-slate-600 truncate">Equipe: {getInvolvedTeam(activity)}</p>
+                      <p className="text-[8px] lg:text-[9px] font-medium text-slate-600 truncate">Equipe: {getInvolvedTeam(activity)}</p>
                     </div>
                     {!isCreator && (
                       <div className="flex items-center gap-1.5 mt-1 text-[9px] lg:text-[10px] text-slate-400 italic">
@@ -3600,7 +3601,8 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
                 type="date"
                 value={filters.startDate}
                 onChange={e => setFilters({...filters, startDate: e.target.value})}
-                className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px]"
+                onClick={(e) => (e.target as any).showPicker?.()}
+                className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px] cursor-pointer"
               />
             </div>
           </div>
@@ -3616,7 +3618,7 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
             </div>
 
             {showCodeFilterList && (
-              <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
+              <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
                 <button
                   type="button"
                   className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
@@ -3659,7 +3661,7 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
             </div>
 
             {showStatusFilterList && (
-              <div className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
+              <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
                 <button
                   type="button"
                   className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
@@ -3726,12 +3728,12 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase">{act.code}</span>
-                      <h4 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{act.om_number}</h4>
+                      <h4 className="font-bold text-xs lg:text-sm text-slate-900 group-hover:text-blue-600 transition-colors">{act.om_number}</h4>
                     </div>
-                    <p className="text-xs text-slate-500">{act.operation} • {act.location_name}</p>
+                    <p className="text-[10px] text-slate-500">{act.operation} • {act.location_name}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <Users size={12} className="text-slate-400" />
-                      <p className="text-[10px] font-medium text-slate-600">Equipe: {getInvolvedTeam(act)}</p>
+                      <p className="text-[9px] font-medium text-slate-600">Equipe: {getInvolvedTeam(act)}</p>
                     </div>
                   </div>
                   <div 

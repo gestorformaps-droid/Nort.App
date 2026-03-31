@@ -21,6 +21,13 @@
     height: 100%;
     width: 100%;
   }
+
+  /* Hide default calendar icon in Chromium-based browsers */
+  input[type="date"]::-webkit-inner-spin-button,
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+  }
 }
 
 @utility no-scrollbar {
