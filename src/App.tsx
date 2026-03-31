@@ -3771,19 +3771,9 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
                     <p className="text-[10px] lg:text-xs text-slate-500 truncate">{selectedActivity.code} • {selectedActivity.om_number}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 lg:gap-2 shrink-0">
-                  <button 
-                    onClick={downloadPDF}
-                    className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-blue-600 flex items-center gap-1 lg:gap-2 text-[10px] lg:text-xs font-bold"
-                    title="Baixar PDF"
-                  >
-                    <FileText size={18} />
-                    <span className="hidden sm:inline">PDF</span>
-                  </button>
                   <button onClick={() => setSelectedActivity(null)} className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400">
                     <X size={20} />
                   </button>
-                </div>
               </div>
               
               <div id="detailed-report-content" className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 lg:space-y-8 bg-slate-50 no-scrollbar">
@@ -3920,11 +3910,6 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
                 </div>
               </div>
 
-              <div className="p-6 bg-slate-50 border-t border-slate-100 flex gap-3">
-                <Button variant="secondary" className="flex-1" onClick={() => setSelectedActivity(null)}>
-                  Fechar
-                </Button>
-              </div>
             </motion.div>
           </div>
         )}
