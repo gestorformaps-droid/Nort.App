@@ -2464,9 +2464,11 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
   const [filters, setFilters] = useState({
     startDate: getBrasiliaDateString(),
     serviceCode: '',
+    status: '',
     search: ''
   });
   const [showCodeFilterList, setShowCodeFilterList] = useState(false);
+  const [showStatusFilterList, setShowStatusFilterList] = useState(false);
   const [justificationModal, setJustificationModal] = useState<{ id: number, status: ActivityStatus } | null>(null);
   const [justification, setJustification] = useState('');
   const [loading, setLoading] = useState(false);
@@ -2903,11 +2905,12 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
   const [hoveredActivity, setHoveredActivity] = useState<Activity | null>(null);
   const [filters, setFilters] = useState({
     startDate: getBrasiliaDateString(),
-    endDate: getBrasiliaDateString(),
     serviceCode: '',
     status: '',
     search: ''
   });
+  const [showCodeFilterList, setShowCodeFilterList] = useState(false);
+  const [showStatusFilterList, setShowStatusFilterList] = useState(false);
 
   const getInvolvedTeam = (act: Activity) => {
     let registrations: string[] = [];
@@ -2938,7 +2941,7 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
     return activities.filter(a => {
       const date = parseISO(a.created_at);
       const start = startOfDay(parseISO(filters.startDate));
-      const end = endOfDay(parseISO(filters.endDate));
+      const end = endOfDay(parseISO(filters.startDate));
       
       const dateMatch = isWithinInterval(date, { start, end });
       const serviceMatch = !filters.serviceCode || a.code === filters.serviceCode;
@@ -2982,65 +2985,118 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
           
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Início</label>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Data</label>
               <div className="relative">
                 <Calendar size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input 
                   type="date"
                   value={filters.startDate}
                   onChange={e => setFilters({...filters, startDate: e.target.value})}
-                  className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+                  onClick={(e) => (e.target as any).showPicker?.()}
+                  className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer"
                 />
               </div>
             </div>
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Fim</label>
-              <div className="relative">
-                <Calendar size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input 
-                  type="date"
-                  value={filters.endDate}
-                  onChange={e => setFilters({...filters, endDate: e.target.value})}
-                  className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
-                />
+
+            <div className="space-y-1 relative">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Código</label>
+              <div 
+                className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-xs focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
+                onClick={() => setShowCodeFilterList(!showCodeFilterList)}
+              >
+                <span className="truncate">{filters.serviceCode || 'Todos'}</span>
+                <ChevronDown size={14} className="text-slate-400 ml-1 shrink-0" />
               </div>
+              
+              {showCodeFilterList && (
+                <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
+                  <button
+                    type="button"
+                    className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFilters({...filters, serviceCode: ''});
+                      setShowCodeFilterList(false);
+                    }}
+                  >
+                    <span className="text-xs text-slate-900">Todos</span>
+                    {!filters.serviceCode && <CheckCircle2 size={12} className="text-blue-500" />}
+                  </button>
+                  {OM_CODES.map(code => (
+                    <button
+                      key={code}
+                      type="button"
+                      className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFilters({...filters, serviceCode: code});
+                        setShowCodeFilterList(false);
+                      }}
+                    >
+                      <span className="text-xs text-slate-900">{code}</span>
+                      {filters.serviceCode === code && <CheckCircle2 size={12} className="text-blue-500" />}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Código</label>
-              <select 
-                value={filters.serviceCode}
-                onChange={e => setFilters({...filters, serviceCode: e.target.value})}
-                className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
-              >
-                <option value="">Todos</option>
-                {OM_CODES.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            <div className="space-y-1">
+            <div className="space-y-1 relative">
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Status</label>
-              <select 
-                value={filters.status}
-                onChange={e => setFilters({...filters, status: e.target.value})}
-                className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+              <div 
+                className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-xs focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
+                onClick={() => setShowStatusFilterList(!showStatusFilterList)}
               >
-                <option value="">Todos</option>
-                {ACTIVITY_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
+                <span className="truncate">{filters.status || 'Todos'}</span>
+                <ChevronDown size={14} className="text-slate-400 ml-1 shrink-0" />
+              </div>
+              
+              {showStatusFilterList && (
+                <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
+                  <button
+                    type="button"
+                    className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFilters({...filters, status: ''});
+                      setShowStatusFilterList(false);
+                    }}
+                  >
+                    <span className="text-xs text-slate-900">Todos</span>
+                    {!filters.status && <CheckCircle2 size={12} className="text-blue-500" />}
+                  </button>
+                  {ACTIVITY_STATUSES.map(status => (
+                    <button
+                      key={status}
+                      type="button"
+                      className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setFilters({...filters, status: status});
+                        setShowStatusFilterList(false);
+                      }}
+                    >
+                      <span className="text-xs text-slate-900">{status}</span>
+                      {filters.status === status && <CheckCircle2 size={12} className="text-blue-500" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-end">
+              <Button variant="outline" className="w-full h-[42px] text-xs font-bold border-slate-200 hover:bg-slate-50" onClick={() => setFilters({
+                startDate: getBrasiliaDateString(),
+                serviceCode: '',
+                status: '',
+                search: ''
+              })}>
+                <X size={14} className="mr-1" /> Limpar
+              </Button>
             </div>
           </div>
-
-          <Button variant="outline" className="w-full h-[42px] text-sm mt-1" onClick={() => setFilters({
-            startDate: getBrasiliaDateString(),
-            endDate: getBrasiliaDateString(),
-            serviceCode: '',
-            status: '',
-            search: ''
-          })}>
-            <X size={16} className="mr-2" /> Limpar
-          </Button>
         </div>
 
         {/* Stats */}
