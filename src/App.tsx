@@ -1997,15 +1997,45 @@ function DashboardNewRecordView({ user, locations, employees, onSuccess }: { use
   const [error, setError] = useState('');
   const [currentPos, setCurrentPos] = useState<{ latitude: number, longitude: number, accuracy: number } | null>(null);
 
+  const [gpsStatus, setGpsStatus] = useState<'requesting' | 'captured' | 'error'>('requesting');
+
+  const captureLocation = React.useCallback(() => {
+    if (!navigator.geolocation) {
+      setError('Geolocalização não suportada');
+      setGpsStatus('error');
+      return;
+    }
+
+    setGpsStatus('requesting');
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCurrentPos({
+          latitude: roundCoord(position.coords.latitude),
+          longitude: roundCoord(position.coords.longitude),
+          accuracy: position.coords.accuracy
+        });
+        setGpsStatus('captured');
+      },
+      (err) => {
+        console.error('GPS Capture Error:', err);
+        setGpsStatus('error');
+        setError('Erro ao capturar localização. Verifique o GPS.');
+      },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 }
+    );
+  }, []);
+
   useEffect(() => {
+    captureLocation();
+    
     let watchId: number;
     if (navigator.geolocation) {
       watchId = navigator.geolocation.watchPosition(
         (position) => {
           const acc = position.coords.accuracy;
           setCurrentPos(prev => {
-            // Só atualiza se for o primeiro ping OU se o novo ping tiver raio de precisão menor/igual
             if (!prev || acc <= prev.accuracy) {
+              setGpsStatus('captured');
               return {
                 latitude: roundCoord(position.coords.latitude),
                 longitude: roundCoord(position.coords.longitude),
@@ -2022,7 +2052,7 @@ function DashboardNewRecordView({ user, locations, employees, onSuccess }: { use
     return () => {
       if (watchId) navigator.geolocation.clearWatch(watchId);
     };
-  }, []);
+  }, [captureLocation]);
   const [searchEmp, setSearchEmp] = useState('');
   const [showEmpList, setShowEmpList] = useState(false);
   const [searchLoc, setSearchLoc] = useState('');
@@ -2133,6 +2163,41 @@ function DashboardNewRecordView({ user, locations, employees, onSuccess }: { use
 
   return (
     <form onSubmit={handleSubmit} className="bg-white p-4 sm:p-5 lg:p-6 rounded-xl border border-slate-200 shadow-sm space-y-4 lg:space-y-6">
+      <div className="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-100 mb-2">
+        <div className="flex items-center gap-3">
+          <div className={cn(
+            "w-10 h-10 rounded-full flex items-center justify-center transition-colors",
+            gpsStatus === 'requesting' ? "bg-blue-100 text-blue-600 animate-pulse" :
+            gpsStatus === 'captured' ? "bg-emerald-100 text-emerald-600" :
+            "bg-red-100 text-red-600"
+          )}>
+            {gpsStatus === 'requesting' ? <RefreshCw size={20} className="animate-spin" /> : 
+             gpsStatus === 'captured' ? <MapPin size={20} /> : 
+             <AlertTriangle size={20} />}
+          </div>
+          <div>
+            <p className="text-xs font-bold text-slate-900">
+              {gpsStatus === 'requesting' ? 'Solicitando localização...' :
+               gpsStatus === 'captured' ? 'Localização capturada!' :
+               'Erro na localização'}
+            </p>
+            <p className="text-[10px] text-slate-500">
+              {gpsStatus === 'requesting' ? 'Aguardando sinal do navegador...' :
+               gpsStatus === 'captured' ? `Raio de precisão: ${currentPos?.accuracy.toFixed(1)}m` :
+               'Habilite o acesso ao GPS nas configurações'}
+            </p>
+          </div>
+        </div>
+        <button 
+          type="button"
+          onClick={captureLocation}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-slate-600 text-[10px] font-bold uppercase tracking-wider rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors shadow-sm"
+        >
+          <RefreshCw size={12} />
+          Recapturar
+        </button>
+      </div>
+
       {error && (
         <div className="p-3 lg:p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl flex items-center gap-3">
           <AlertCircle size={18} className="shrink-0" />
