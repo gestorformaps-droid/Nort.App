@@ -4816,6 +4816,17 @@ function OccurrenceDetailsModal({ occurrence, onClose, user, onUpdate }: { occur
 
   useEffect(() => {
     fetchComments();
+
+    const channel = supabase
+      .channel(`comments-modal-${occurrence.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'occurrence_comments', filter: `occurrence_id=eq.${occurrence.id}` }, () => {
+        fetchComments();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [occurrence.id]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
