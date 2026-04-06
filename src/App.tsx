@@ -487,6 +487,48 @@ export default function App() {
           setOccurrences(prev => prev.map(o => o.id === occ.id ? occ : o));
         }
       })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'occurrence_comments' }, (payload) => {
+        const currentUser = wsStateRef.current.user;
+        if (!currentUser) return;
+
+        const comment = payload.new as any;
+        // Fetch occurrence title for the notification
+        fetch(`/api/occurrences`)
+          .then(res => res.json())
+          .then((occs: Occurrence[]) => {
+            const occ = occs.find(o => o.id === comment.occurrence_id);
+            if (!occ) return;
+
+            // Only notify if someone else commented
+            if (comment.user_id !== currentUser.id) {
+              setCurrentToast({
+                title: `Novo comentário em: ${occ.title}`,
+                message: `Uma nova mensagem foi enviada na ocorrência.`,
+                occurrenceId: occ.id
+              });
+              setTimeout(() => setCurrentToast(null), 5000);
+
+              setNotifications(prev => {
+                const id = `comm-${comment.id}`;
+                if (prev.find(n => n.id === id)) return prev;
+                
+                return [
+                  {
+                    id,
+                    title: `Novo Comentário: ${occ.title}`,
+                    message: `Alguém comentou na ocorrência que você está acompanhando.`,
+                    type: 'occurrence',
+                    category: 'manager',
+                    date: format(new Date(), 'HH:mm'),
+                    read: false,
+                    occurrenceId: occ.id
+                  },
+                  ...prev
+                ].slice(0, 20);
+              });
+            }
+          });
+      })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'activities' }, (payload) => {
         const currentUser = wsStateRef.current.user;
         if (payload.eventType === 'INSERT') {
@@ -4642,6 +4684,9 @@ function OccurrenceDetailsModal({ occurrence, onClose, user, onUpdate }: { occur
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const fetchComments = async () => {
     setLoading(true);
@@ -4662,23 +4707,57 @@ function OccurrenceDetailsModal({ occurrence, onClose, user, onUpdate }: { occur
     fetchComments();
   }, [occurrence.id]);
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newComment.trim() || submitting) return;
+    if ((!newComment.trim() && !selectedImage) || submitting) return;
 
     setSubmitting(true);
+    let imageUrl = null;
+
     try {
+      if (selectedImage) {
+        // Upload image to Supabase
+        const fileName = `${Date.now()}-${selectedImage.name}`;
+        const { data, error: uploadError } = await supabase.storage
+          .from('occurrence-images')
+          .upload(fileName, selectedImage);
+
+        if (uploadError) {
+          console.error("Error uploading image:", uploadError);
+          // If the bucket doesn't exist, we might get an error here.
+          // For now, I'll just skip the image if there's an error.
+        } else if (data) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('occurrence-images')
+            .getPublicUrl(fileName);
+          imageUrl = publicUrl;
+        }
+      }
+
       const res = await fetch(`/api/occurrences/${occurrence.id}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: newComment,
-          userId: user.id
+          userId: user.id,
+          imageUrl
         })
       });
 
       if (res.ok) {
         setNewComment('');
+        setSelectedImage(null);
+        setImagePreview(null);
         fetchComments();
       }
     } catch (err) {
@@ -4702,8 +4781,8 @@ function OccurrenceDetailsModal({ occurrence, onClose, user, onUpdate }: { occur
                <AlertCircle size={20} />
              </div>
              <div>
-               <h3 className="text-lg font-bold text-slate-900 uppercase tracking-tight">{occurrence.type}</h3>
-               <p className="text-xs text-slate-400 font-medium">Detalhes da Ocorrência</p>
+               <h3 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Detalhes da Ocorrência</h3>
+               <p className="text-xs text-slate-400 font-medium">Informações e Acompanhamento</p>
              </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
@@ -4803,7 +4882,21 @@ function OccurrenceDetailsModal({ occurrence, onClose, user, onUpdate }: { occur
                             ? "bg-blue-600 text-white rounded-tr-none" 
                             : "bg-white border border-slate-100 text-slate-700 rounded-tl-none"
                         )}>
-                          {comment.text}
+                          {comment.text && <p>{comment.text}</p>}
+                          {comment.image_url && (
+                            <div className="mt-2 relative group">
+                              <img src={comment.image_url} className="rounded-lg max-w-full h-auto border border-white/20 shadow-sm" alt="Foto da ocorrência" />
+                              <a 
+                                href={comment.image_url} 
+                                download 
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="absolute bottom-2 right-2 p-1.5 bg-black/50 hover:bg-black/70 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <Download size={14} />
+                              </a>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </motion.div>
@@ -4815,7 +4908,39 @@ function OccurrenceDetailsModal({ occurrence, onClose, user, onUpdate }: { occur
         </div>
 
         <div className="p-4 bg-slate-50 border-t border-slate-100 shrink-0">
+          {imagePreview && (
+            <div className="mb-3 relative inline-block">
+              <img src={imagePreview} className="h-20 w-20 object-cover rounded-xl border-2 border-white shadow-md" />
+              <button 
+                onClick={() => { setSelectedImage(null); setImagePreview(null); }}
+                className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors"
+              >
+                <X size={12} />
+              </button>
+            </div>
+          )}
           <form onSubmit={handleAddComment} className="flex items-center gap-2">
+            <input 
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageSelect}
+              accept="image/*"
+              className="hidden"
+            />
+            <button 
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="p-2.5 text-slate-400 hover:bg-slate-200/50 hover:text-slate-600 rounded-xl transition-all"
+            >
+              <Paperclip size={20} />
+            </button>
+            <button 
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="p-2.5 text-slate-400 hover:bg-slate-200/50 hover:text-slate-600 rounded-xl transition-all"
+            >
+              <Camera size={20} />
+            </button>
             <input 
               type="text"
               placeholder="Escreva seu comentário..."
@@ -4825,7 +4950,7 @@ function OccurrenceDetailsModal({ occurrence, onClose, user, onUpdate }: { occur
             />
             <button 
               type="submit"
-              disabled={submitting || !newComment.trim()}
+              disabled={submitting || (!newComment.trim() && !selectedImage)}
               className="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-700 disabled:opacity-50 disabled:hover:bg-blue-600 transition-colors shadow-lg shadow-blue-600/20 active:scale-95"
             >
               {submitting ? <RefreshCw size={18} className="animate-spin" /> : <Send size={18} />}

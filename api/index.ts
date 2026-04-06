@@ -511,7 +511,7 @@ app.get("/api/occurrences/:id/comments", async (req, res) => {
 
 app.post("/api/occurrences/:id/comments", async (req, res) => {
   const { id: occurrenceId } = req.params;
-  const { userId, text } = req.body;
+  const { userId, text, imageUrl } = req.body;
   const now = getBrasiliaISO();
 
   const { data: user } = await supabase.from("users").select("name, avatar_url, avatar_position").eq("id", userId).single();
@@ -522,6 +522,7 @@ app.post("/api/occurrences/:id/comments", async (req, res) => {
       occurrence_id: occurrenceId,
       user_id: userId,
       text,
+      image_url: imageUrl || null,
       created_at: now
     })
     .select()

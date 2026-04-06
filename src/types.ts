@@ -25,6 +25,7 @@ export interface OccurrenceComment {
   user_name: string;
   user_avatar?: string;
   text: string;
+  image_url?: string;
   created_at: string;
 }
 
