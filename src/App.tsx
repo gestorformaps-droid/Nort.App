@@ -4449,7 +4449,7 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('Todas');
   const [filterCode, setFilterCode] = useState<string>('');
-  const [filterDate, setFilterDate] = useState<string>('');
+  const [filterDate, setFilterDate] = useState<string>(() => format(new Date(), 'yyyy-MM-dd'));
   const [loading, setLoading] = useState(false);
   const [showCategoryFilterList, setShowCategoryFilterList] = useState(false);
   const [showCodeFilterList, setShowCodeFilterList] = useState(false);
@@ -4472,7 +4472,7 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
       // Actually, looking at image 3, code is CIVI-HID etc. 
       // I'll assume occ.type or check if they have a code.
       
-      const occDate = new Date(occ.timestamp).toISOString().split('T')[0];
+      const occDate = format(new Date(occ.timestamp), 'yyyy-MM-dd');
       const matchesDate = !filterDate || occDate === filterDate;
       
       return matchesSearch && matchesType && matchesCode && matchesDate;
