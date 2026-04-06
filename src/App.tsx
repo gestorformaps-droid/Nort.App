@@ -1035,14 +1035,14 @@ export default function App() {
                 {showNotifications && (
                   <>
                     <div 
-                      className="fixed inset-0 z-[1006]" 
+                      className="fixed inset-0 z-[1999]" 
                       onClick={() => setShowNotifications(false)} 
                     />
                     <motion.div 
                       initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute right-0 mt-2 w-[calc(100vw-32px)] sm:w-80 lg:w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 z-[1007] overflow-hidden"
+                      className="absolute right-0 mt-2 w-[calc(100vw-32px)] sm:w-80 lg:w-96 bg-white rounded-2xl shadow-2xl border border-slate-100 z-[2000] overflow-hidden"
                     >
                       <div className="p-4 border-b border-slate-50 bg-slate-50/50 flex items-center justify-between">
                         <h4 className="font-bold text-slate-900 text-sm">Notificações</h4>
@@ -2723,10 +2723,10 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
                     )}
                   </div>
 
-                  <div className="lg:col-span-1">
+                  <div className="lg:col-span-2">
                     <Button 
                       variant="outline" 
-                      className="h-[42px] w-full px-0 border-slate-200 hover:bg-slate-50 transition-colors shrink-0" 
+                      className="h-[42px] w-full px-4 border-slate-200 hover:bg-slate-50 transition-colors shrink-0 flex items-center justify-center gap-2" 
                       onClick={() => setFilters({
                         startDate: '',
                         serviceCode: '',
@@ -2734,6 +2734,7 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
                       })}
                     >
                       <X size={16} />
+                      <span className="text-[10px] font-bold uppercase tracking-wider">Limpar</span>
                     </Button>
                   </div>
                 </div>
@@ -3735,7 +3736,7 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
       <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm relative z-[1010]">
         <div className="flex flex-col lg:grid lg:grid-cols-12 gap-3 items-end">
           {/* Search Row */}
-          <div className="w-full lg:col-span-5 space-y-1">
+          <div className="w-full lg:col-span-4 space-y-1">
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 lg:block hidden">Busca</label>
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
@@ -3876,10 +3877,10 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
                     )}
                   </div>
 
-                  <div className="lg:col-span-1">
+                  <div className="lg:col-span-2">
                     <Button 
                       variant="outline" 
-                      className="h-[42px] w-full px-0 border-slate-200 hover:bg-slate-50 transition-colors shrink-0" 
+                      className="h-[42px] w-full px-4 border-slate-200 hover:bg-slate-50 transition-colors shrink-0 flex items-center justify-center gap-2" 
                       onClick={() => setFilters({
                         startDate: getBrasiliaDateString(),
                         serviceCode: '',
@@ -3888,6 +3889,7 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
                       })}
                     >
                       <X size={16} />
+                      <span className="text-[10px] font-bold uppercase tracking-wider">Limpar</span>
                     </Button>
                   </div>
                 </div>
@@ -4650,10 +4652,10 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
                     </div>
                   </div>
 
-                  <div className="lg:col-span-1">
+                  <div className="lg:col-span-2">
                     <Button 
                       variant="outline" 
-                      className="h-[42px] w-full px-0 border-slate-200 hover:bg-slate-50 transition-colors shrink-0" 
+                      className="h-[42px] w-full px-4 border-slate-200 hover:bg-slate-50 transition-colors shrink-0 flex items-center justify-center gap-2" 
                       onClick={() => {
                         setSearchQuery('');
                         setFilterType('Todas');
@@ -4662,16 +4664,7 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
                       }}
                     >
                       <X size={16} />
-                    </Button>
-                  </div>
-
-                  <div className="lg:col-span-1">
-                    <Button 
-                      onClick={() => setShowAddModal(true)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 h-[42px] w-full rounded-xl flex items-center justify-center gap-2"
-                    >
-                      <Plus size={18} />
-                      <span className="lg:hidden text-xs font-bold uppercase tracking-wider">Novo</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider">Limpar</span>
                     </Button>
                   </div>
                 </div>
