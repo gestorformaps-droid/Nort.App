@@ -2622,7 +2622,7 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
   return (
     <div className="space-y-4 lg:space-y-6">
       {/* Filters */}
-      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm relative z-[1010]">
+      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm relative z-[100]">
         <div className="flex flex-col lg:grid lg:grid-cols-12 gap-3 items-end">
           {/* Search Row */}
           <div className="w-full lg:col-span-6 space-y-1">
@@ -3733,7 +3733,7 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
   return (
     <div className="space-y-4 lg:space-y-8">
       {/* Filters */}
-      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm relative z-[1010]">
+      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm relative z-[100]">
         <div className="flex flex-col lg:grid lg:grid-cols-12 gap-3 items-end">
           {/* Search Row */}
           <div className="w-full lg:col-span-4 space-y-1">
@@ -4520,7 +4520,7 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
 
   return (
     <div className="flex flex-col gap-4 lg:gap-6 flex-1 min-h-0 no-scrollbar">
-      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm relative z-[1010]">
+      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm relative z-[100]">
         <div className="flex flex-col lg:grid lg:grid-cols-12 gap-3 items-end">
           {/* Search Row */}
           <div className="w-full lg:col-span-4 space-y-1">
