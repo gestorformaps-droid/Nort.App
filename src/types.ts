@@ -18,6 +18,16 @@ export interface Occurrence {
   status?: string;
 }
 
+export interface OccurrenceComment {
+  id: number;
+  occurrence_id: number;
+  user_id: number;
+  user_name: string;
+  user_avatar?: string;
+  text: string;
+  created_at: string;
+}
+
 export interface User {
   id: number;
   name: string;

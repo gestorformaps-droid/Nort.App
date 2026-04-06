@@ -488,6 +488,55 @@ app.put("/api/occurrences/:id/status", async (req, res) => {
   res.json({ success: true, id: Number(id), status });
 });
 
+app.get("/api/occurrences/:id/comments", async (req, res) => {
+  const { id: occurrenceId } = req.params;
+  const { data, error } = await supabase
+    .from("occurrence_comments")
+    .select(`
+      *,
+      users(name, avatar_url, avatar_position)
+    `)
+    .eq("occurrence_id", occurrenceId)
+    .order("created_at", { ascending: true });
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  res.json((data || []).map((c: any) => ({
+    ...c,
+    user_name: c.users?.name,
+    user_avatar: c.users?.avatar_url || null,
+    user_avatar_position: c.users?.avatar_position || 'center'
+  })));
+});
+
+app.post("/api/occurrences/:id/comments", async (req, res) => {
+  const { id: occurrenceId } = req.params;
+  const { userId, text } = req.body;
+  const now = getBrasiliaISO();
+
+  const { data: user } = await supabase.from("users").select("name, avatar_url, avatar_position").eq("id", userId).single();
+  
+  const { data: comment, error } = await supabase
+    .from("occurrence_comments")
+    .insert({
+      occurrence_id: occurrenceId,
+      user_id: userId,
+      text,
+      created_at: now
+    })
+    .select()
+    .single();
+
+  if (error || !comment) return res.status(400).json({ error: "Erro ao adicionar comentário" });
+
+  res.json({
+    ...comment,
+    user_name: user?.name,
+    user_avatar: user?.avatar_url || null,
+    user_avatar_position: user?.avatar_position || 'center'
+  });
+});
+
 async function setupVite() {
   if (process.env.NODE_ENV !== "production") {
     const { createServer: createViteServer } = await import("vite");

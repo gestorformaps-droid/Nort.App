@@ -4336,6 +4336,7 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
   const [loading, setLoading] = useState(false);
   const [showCategoryFilterList, setShowCategoryFilterList] = useState(false);
   const [showCodeFilterList, setShowCodeFilterList] = useState(false);
+  const [selectedOccurrence, setSelectedOccurrence] = useState<Occurrence | null>(null);
 
   const filteredOccurrences = useMemo(() => {
     return occurrences.filter(occ => {
@@ -4542,7 +4543,8 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
                 key={occ.id}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-all group"
+                onClick={() => setSelectedOccurrence(occ)}
+                className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-all group cursor-pointer"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -4622,7 +4624,215 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
             loading={loading}
           />
         )}
+        {selectedOccurrence && (
+          <OccurrenceDetailsModal 
+            occurrence={selectedOccurrence}
+            onClose={() => setSelectedOccurrence(null)}
+            user={user}
+            onUpdate={onUpdate}
+          />
+        )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+function OccurrenceDetailsModal({ occurrence, onClose, user, onUpdate }: { occurrence: Occurrence, onClose: () => void, user: User, onUpdate: () => void }) {
+  const [comments, setComments] = useState<OccurrenceComment[]>([]);
+  const [newComment, setNewComment] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const fetchComments = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/occurrences/${occurrence.id}/comments`);
+      if (res.ok) {
+        const data = await res.json();
+        setComments(data);
+      }
+    } catch (err) {
+      console.error("Error fetching comments:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchComments();
+  }, [occurrence.id]);
+
+  const handleAddComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim() || submitting) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/occurrences/${occurrence.id}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: newComment,
+          userId: user.id
+        })
+      });
+
+      if (res.ok) {
+        setNewComment('');
+        fetchComments();
+      }
+    } catch (err) {
+      console.error("Error adding comment:", err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90dvh]"
+      >
+        <div className="p-6 border-b border-slate-100 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+               <AlertCircle size={20} />
+             </div>
+             <div>
+               <h3 className="text-lg font-bold text-slate-900 uppercase tracking-tight">{occurrence.type}</h3>
+               <p className="text-xs text-slate-400 font-medium">Detalhes da Ocorrência</p>
+             </div>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
+            <X size={20} />
+          </button>
+        </div>
+        
+        <div className="flex-1 overflow-y-auto no-scrollbar p-6 space-y-6">
+          <div className="space-y-4">
+            <div className="flex items-start justify-between">
+              <h2 className="text-xl font-bold text-slate-900">{occurrence.title}</h2>
+              <div className={cn(
+                "px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border",
+                occurrence.status === 'Solucionado' ? "bg-green-50 text-green-600 border-green-100" : "bg-slate-50 text-slate-500 border-slate-100"
+              )}>
+                {occurrence.status}
+              </div>
+            </div>
+            
+            <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100 whitespace-pre-wrap">
+              {occurrence.description}
+            </p>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl">
+                <MapPin size={16} className="text-slate-400" />
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Localização</p>
+                  <p className="text-xs font-bold text-slate-700 truncate">{occurrence.location}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl">
+                <Calendar size={16} className="text-slate-400" />
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Data/Hora</p>
+                  <p className="text-xs font-bold text-slate-700 truncate">
+                    {format(new Date(occurrence.timestamp), "dd/MM HH:mm", { locale: ptBR })}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4 pt-6 border-t border-slate-100">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <MessageCircle size={16} className="text-blue-500" />
+                Comentários e Observações
+              </h4>
+              <span className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-md uppercase">
+                {comments.length} Mensagens
+              </span>
+            </div>
+
+            <div className="space-y-4 min-h-[100px]">
+              {loading && comments.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-6 text-slate-400 italic text-xs">
+                  <RefreshCw size={24} className="animate-spin mb-2 opacity-20" />
+                  Carregando comentários...
+                </div>
+              ) : comments.length === 0 ? (
+                <div className="py-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                  <p className="text-xs text-slate-400 italic">Ainda não há comentários nesta ocorrência.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {comments.map((comment) => (
+                    <motion.div 
+                      key={comment.id}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={cn(
+                        "flex gap-3",
+                        comment.user_id === user.id ? "flex-row-reverse" : "flex-row"
+                      )}
+                    >
+                      <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-slate-100 mt-1">
+                        {comment.user_avatar ? (
+                          <img src={comment.user_avatar} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400">
+                            <UserIcon size={14} />
+                          </div>
+                        )}
+                      </div>
+                      <div className={cn(
+                        "max-w-[80%] flex flex-col",
+                        comment.user_id === user.id ? "items-end" : "items-start"
+                      )}>
+                        <div className="flex items-center gap-2 mb-1 px-1">
+                          <span className="text-[10px] font-bold text-slate-900">{comment.user_name}</span>
+                          <span className="text-[10px] text-slate-400 font-medium">{format(new Date(comment.created_at), "HH:mm", { locale: ptBR })}</span>
+                        </div>
+                        <div className={cn(
+                          "px-4 py-2.5 rounded-2xl text-sm shadow-sm",
+                          comment.user_id === user.id 
+                            ? "bg-blue-600 text-white rounded-tr-none" 
+                            : "bg-white border border-slate-100 text-slate-700 rounded-tl-none"
+                        )}>
+                          {comment.text}
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 bg-slate-50 border-t border-slate-100 shrink-0">
+          <form onSubmit={handleAddComment} className="flex items-center gap-2">
+            <input 
+              type="text"
+              placeholder="Escreva seu comentário..."
+              value={newComment}
+              onChange={e => setNewComment(e.target.value)}
+              className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-sm"
+            />
+            <button 
+              type="submit"
+              disabled={submitting || !newComment.trim()}
+              className="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-700 disabled:opacity-50 disabled:hover:bg-blue-600 transition-colors shadow-lg shadow-blue-600/20 active:scale-95"
+            >
+              {submitting ? <RefreshCw size={18} className="animate-spin" /> : <Send size={18} />}
+            </button>
+          </form>
+        </div>
+      </motion.div>
     </div>
   );
 }
