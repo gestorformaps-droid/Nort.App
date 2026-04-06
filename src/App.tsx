@@ -84,6 +84,7 @@ import {
   Location, 
   Message,
   Occurrence,
+  OccurrenceComment,
   ActivityStatus, 
   STATUS_COLORS, 
   OM_CODES, 
@@ -786,7 +787,7 @@ export default function App() {
           </h1>
           <p className="text-slate-400 text-sm mb-8 leading-relaxed">
             {isPendingApproval 
-              ? "Seu perfil de gestor foi criado com sucesso! Por motivos de segurança, um administrador precisa liberar seu acesso antes de você começar."
+              ? "Seu perfil de supervisor foi criado com sucesso! Por motivos de segurança, um administrador precisa liberar seu acesso antes de você começar."
               : "Por motivos de segurança, a redefinição de senha deve ser solicitada diretamente à nossa equipe técnica."
             }
           </p>
@@ -884,7 +885,7 @@ export default function App() {
         <nav className="flex-1 p-3 lg:p-4 space-y-2 overflow-y-auto no-scrollbar">
           <SidebarItem 
             icon={<UserIcon size={20} />} 
-            label={user?.role === 'manager' ? 'Painel do Gestor' : 'Meu Painel'} 
+            label={user?.role === 'manager' ? 'Painel do Supervisor' : 'Meu Painel'} 
             active={activeTab === 'profile'} 
             onClick={() => { setActiveTab('profile'); setIsMobileMenuOpen(false); }} 
             collapsed={!isSidebarOpen && window.innerWidth >= 1024}
@@ -997,7 +998,7 @@ export default function App() {
             </button>
             <div className="min-w-0">
               <h2 className="text-base lg:text-lg font-bold text-white leading-tight truncate">
-                {activeTab === 'profile' && (user?.role === 'manager' ? 'Painel do Gestor' : 'Painel Funcionário')}
+                {activeTab === 'profile' && (user?.role === 'manager' ? 'Painel do Supervisor' : 'Painel do Funcionário')}
                 {activeTab === 'new' && 'Novo Registro'}
                 {activeTab === 'list' && 'Lista de Registros'}
                 {activeTab === 'manager' && 'Mapa Operacional'}
@@ -1448,7 +1449,7 @@ function AuthPage({ view, setView, setUser, setIsPendingApproval }: { view: 'log
                       className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-10 text-white appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all text-base md:text-sm"
                     >
                       <option value="employee" className="bg-[#00153D]">Perfil: Funcionário</option>
-                      <option value="manager" className="bg-[#00153D]">Perfil: Gestor</option>
+                      <option value="manager" className="bg-[#00153D]">Perfil: Supervisor</option>
                     </select>
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-400/50 pointer-events-none">
                       <ChevronRight size={16} className="rotate-90" />
@@ -1808,7 +1809,7 @@ function ProfileView({ user, onUpdate, onUserUpdate, canToggleStatus = true, rea
           <h3 className="text-lg lg:text-lg font-bold text-slate-900">{user.name}</h3>
           <p className="text-slate-500 text-xs lg:text-sm">Matrícula: {user.registration}</p>
           <div className="mt-4 inline-flex px-3 py-1 bg-blue-50 text-blue-700 text-[11px] font-bold rounded-full uppercase tracking-wider">
-            {user.function || (user.role === 'employee' ? 'Funcionário' : 'Gestor')}
+            {user.function || (user.role === 'employee' ? 'Funcionário' : 'Supervisor')}
           </div>
         </div>
       </div>
@@ -4891,7 +4892,7 @@ function OccurrenceDetailsModal({ occurrence, onClose, user, onUpdate }: { occur
                <AlertCircle size={20} />
              </div>
              <div>
-               <h3 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Detalhes da Ocorrência</h3>
+               <h3 className="text-base font-bold text-slate-900 uppercase tracking-tight">Detalhes da Ocorrência</h3>
                <p className="text-xs text-slate-400 font-medium">Informações e Acompanhamento</p>
              </div>
           </div>
@@ -5043,13 +5044,6 @@ function OccurrenceDetailsModal({ occurrence, onClose, user, onUpdate }: { occur
               className="p-2.5 text-slate-400 hover:bg-slate-200/50 hover:text-slate-600 rounded-xl transition-all"
             >
               <Paperclip size={20} />
-            </button>
-            <button 
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="p-2.5 text-slate-400 hover:bg-slate-200/50 hover:text-slate-600 rounded-xl transition-all"
-            >
-              <Camera size={20} />
             </button>
             <input 
               type="text"
