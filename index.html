@@ -14,6 +14,13 @@
         -ms-overflow-style: none !important;
         scrollbar-width: none !important;
       }
+
+      /* Prevent iOS auto-zoom on input focus */
+      @media screen and (max-width: 768px) {
+        input, textarea, select {
+          font-size: 16px !important;
+        }
+      }
     </style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   </head>
