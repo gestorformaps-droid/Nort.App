@@ -9,6 +9,7 @@ import {
   LogOut, 
   Map as MapIcon, 
   Filter, 
+  Plus,
   CheckCircle2, 
   Clock, 
   AlertCircle, 
@@ -2525,6 +2526,7 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
   });
   const [showCodeFilterList, setShowCodeFilterList] = useState(false);
   const [showStatusFilterList, setShowStatusFilterList] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [justificationModal, setJustificationModal] = useState<{ id: number, status: ActivityStatus } | null>(null);
   const [justification, setJustification] = useState('');
   const [loading, setLoading] = useState(false);
@@ -2620,89 +2622,124 @@ function DashboardActivityListView({ activities, employees, occurrences, user, o
   return (
     <div className="space-y-4 lg:space-y-6">
       {/* Filters */}
-      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
-          <div className="col-span-2 lg:col-span-6 space-y-1">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Busca</label>
-            <div className="relative">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input 
-                type="text"
-                placeholder="Buscar por OM ou Operação..."
-                value={filters.search}
-                onChange={(e) => setFilters({...filters, search: e.target.value})}
-                className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
-              />
+      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm relative z-[1010]">
+        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-3 items-end">
+          {/* Search Row */}
+          <div className="w-full lg:col-span-6 space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 lg:block hidden">Busca</label>
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input 
+                  type="text"
+                  placeholder="Buscar por OM ou Operação..."
+                  value={filters.search}
+                  onChange={(e) => setFilters({...filters, search: e.target.value})}
+                  className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+                />
+              </div>
+              <button 
+                onClick={() => setShowMobileFilters(!showMobileFilters)}
+                className={cn(
+                  "lg:hidden px-4 h-[42px] rounded-xl border font-bold text-[10px] uppercase tracking-wider transition-all flex items-center gap-2",
+                  showMobileFilters 
+                    ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/20" 
+                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                )}
+              >
+                <Filter size={14} />
+                Filtrar
+              </button>
             </div>
           </div>
           
-          <div className="col-span-1 lg:col-span-2 space-y-1">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Data</label>
-            <div className="relative">
-              <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
-              <input 
-                type="date"
-                value={filters.startDate}
-                onChange={e => setFilters({...filters, startDate: e.target.value})}
-                onClick={(e) => (e.target as any).showPicker?.()}
-                className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px] cursor-pointer"
-              />
-            </div>
-          </div>
+          {/* Collapsible Filters */}
+          <AnimatePresence>
+            {(showMobileFilters || window.innerWidth >= 1024) && (
+              <motion.div 
+                initial={window.innerWidth < 1024 ? { height: 0, opacity: 0 } : false}
+                animate={window.innerWidth < 1024 ? { height: 'auto', opacity: 1 } : false}
+                exit={window.innerWidth < 1024 ? { height: 0, opacity: 0 } : false}
+                className={cn(
+                  "w-full lg:contents",
+                  window.innerWidth < 1024 && "overflow-hidden"
+                )}
+              >
+                <div className="flex flex-col lg:contents gap-3 pt-3 lg:pt-0 border-t border-slate-100 lg:border-0 mt-3 lg:mt-0">
+                  <div className="lg:col-span-2 space-y-1">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 lg:block">Data</label>
+                    <div className="relative">
+                      <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
+                      <input 
+                        type="date"
+                        value={filters.startDate}
+                        onChange={e => setFilters({...filters, startDate: e.target.value})}
+                        onClick={(e) => (e.target as any).showPicker?.()}
+                        className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px] cursor-pointer"
+                      />
+                    </div>
+                  </div>
 
-          <div className="col-span-1 lg:col-span-3 space-y-1 relative">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Cód. Serviço</label>
-            <div 
-              className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
-              onClick={() => setShowCodeFilterList(!showCodeFilterList)}
-            >
-              <span className="truncate">{filters.serviceCode || 'Todos'}</span>
-              <ChevronDown size={16} className="text-slate-400 ml-2 shrink-0 mr-1" />
-            </div>
-            
-            {showCodeFilterList && (
-              <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
-                <button
-                  type="button"
-                  className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setFilters({...filters, serviceCode: ''});
-                    setShowCodeFilterList(false);
-                  }}
-                >
-                  <span className="text-sm text-slate-900">Todos</span>
-                  {!filters.serviceCode && <CheckCircle2 size={14} className="text-blue-500" />}
-                </button>
-                {OM_CODES.map(code => (
-                  <button
-                    key={code}
-                    type="button"
-                    className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setFilters({...filters, serviceCode: code});
-                      setShowCodeFilterList(false);
-                    }}
-                  >
-                    <span className="text-sm text-slate-900">{code}</span>
-                    {filters.serviceCode === code && <CheckCircle2 size={14} className="text-blue-500" />}
-                  </button>
-                ))}
-              </div>
+                  <div className="lg:col-span-3 space-y-1 relative">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 lg:block">Cód. Serviço</label>
+                    <div 
+                      className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
+                      onClick={() => setShowCodeFilterList(!showCodeFilterList)}
+                    >
+                      <span className="truncate">{filters.serviceCode || 'Todos'}</span>
+                      <ChevronDown size={16} className="text-slate-400 ml-2 shrink-0 mr-1" />
+                    </div>
+                    
+                    {showCodeFilterList && (
+                      <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
+                        <button
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFilters({...filters, serviceCode: ''});
+                            setShowCodeFilterList(false);
+                          }}
+                        >
+                          <span className="text-sm text-slate-900">Todos</span>
+                          {!filters.serviceCode && <CheckCircle2 size={14} className="text-blue-500" />}
+                        </button>
+                        {OM_CODES.map(code => (
+                          <button
+                            key={code}
+                            type="button"
+                            className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFilters({...filters, serviceCode: code});
+                              setShowCodeFilterList(false);
+                            }}
+                          >
+                            <span className="text-sm text-slate-900">{code}</span>
+                            {filters.serviceCode === code && <CheckCircle2 size={14} className="text-blue-500" />}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="lg:col-span-1">
+                    <Button 
+                      variant="outline" 
+                      className="h-[42px] w-full px-0 border-slate-200 hover:bg-slate-50 transition-colors shrink-0" 
+                      onClick={() => setFilters({
+                        startDate: '',
+                        serviceCode: '',
+                        search: ''
+                      })}
+                    >
+                      <X size={16} />
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
             )}
-          </div>
-
-          <div className="col-span-2 lg:col-span-1">
-            <Button variant="outline" className="h-[42px] w-full px-4 border-slate-200 hover:bg-slate-50 flex items-center justify-center gap-2" onClick={() => setFilters({
-              startDate: '',
-              serviceCode: '',
-              search: ''
-            })}>
-              <X size={16} />
-              <span className="text-xs font-bold uppercase tracking-widest">Limpar</span>
-            </Button>
-          </div>
+          </AnimatePresence>
         </div>
       </div>
 
@@ -3548,6 +3585,7 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
   });
   const [showCodeFilterList, setShowCodeFilterList] = useState(false);
   const [showStatusFilterList, setShowStatusFilterList] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const [selectedEmployee, setSelectedEmployee] = useState<User | null>(null);
   const [history, setHistory] = useState<StatusHistory[]>([]);
@@ -3694,135 +3732,168 @@ function DashboardRecordsView({ activities, employees, onTabChange }: { activiti
   return (
     <div className="space-y-4 lg:space-y-8">
       {/* Filters */}
-      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
-          <div className="lg:col-span-5 space-y-1">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Busca</label>
-            <div className="relative">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input 
-                type="text"
-                placeholder="Buscar OM, Operação ou Descrição..."
-                value={filters.search}
-                onChange={e => setFilters({...filters, search: e.target.value})}
-                className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
-              />
-            </div>
-          </div>
-          <div className="lg:col-span-2 space-y-1">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Data</label>
-            <div className="relative">
-              <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
-              <input 
-                type="date"
-                value={filters.startDate}
-                onChange={e => setFilters({...filters, startDate: e.target.value})}
-                onClick={(e) => (e.target as any).showPicker?.()}
-                className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px] cursor-pointer"
-              />
-            </div>
-          </div>
-          
-          <div className="lg:col-span-2 space-y-1 relative">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Código</label>
-            <div 
-              className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
-              onClick={() => setShowCodeFilterList(!showCodeFilterList)}
-            >
-              <span className="truncate">{filters.serviceCode || 'Todos'}</span>
-              <ChevronDown size={16} className="text-slate-400 ml-2 shrink-0 mr-1" />
-            </div>
-
-            {showCodeFilterList && (
-              <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
-                <button
-                  type="button"
-                  className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setFilters({...filters, serviceCode: ''});
-                    setShowCodeFilterList(false);
-                  }}
-                >
-                  <span className="text-sm text-slate-900">Todos</span>
-                  {!filters.serviceCode && <CheckCircle2 size={14} className="text-blue-500" />}
-                </button>
-                {(OM_CODES || []).map(code => (
-                  <button
-                    key={code}
-                    type="button"
-                    className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setFilters({...filters, serviceCode: code});
-                      setShowCodeFilterList(false);
-                    }}
-                  >
-                    <span className="text-sm text-slate-900">{code}</span>
-                    {filters.serviceCode === code && <CheckCircle2 size={14} className="text-blue-500" />}
-                  </button>
-                ))}
+      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm relative z-[1010]">
+        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-3 items-end">
+          {/* Search Row */}
+          <div className="w-full lg:col-span-5 space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 lg:block hidden">Busca</label>
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input 
+                  type="text"
+                  placeholder="Buscar OM, Operação ou Descrição..."
+                  value={filters.search}
+                  onChange={e => setFilters({...filters, search: e.target.value})}
+                  className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+                />
               </div>
-            )}
-          </div>
-
-          <div className="lg:col-span-2 space-y-1 relative">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Status</label>
-            <div 
-              className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
-              onClick={() => setShowStatusFilterList(!showStatusFilterList)}
-            >
-              <span className="truncate">{filters.status || 'Todos'}</span>
-              <ChevronDown size={16} className="text-slate-400 ml-2 shrink-0 mr-1" />
+              <button 
+                onClick={() => setShowMobileFilters(!showMobileFilters)}
+                className={cn(
+                  "lg:hidden px-4 h-[42px] rounded-xl border font-bold text-[10px] uppercase tracking-wider transition-all flex items-center gap-2",
+                  showMobileFilters 
+                    ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/20" 
+                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                )}
+              >
+                <Filter size={14} />
+                Filtrar
+              </button>
             </div>
+          </div>
 
-            {showStatusFilterList && (
-              <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
-                <button
-                  type="button"
-                  className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setFilters({...filters, status: ''});
-                    setShowStatusFilterList(false);
-                  }}
-                >
-                  <span className="text-sm text-slate-900">Todos</span>
-                  {!filters.status && <CheckCircle2 size={14} className="text-blue-500" />}
-                </button>
-                {(ACTIVITY_STATUSES || []).map(status => (
-                  <button
-                    key={status}
-                    type="button"
-                    className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setFilters({...filters, status: status as any});
-                      setShowStatusFilterList(false);
-                    }}
-                  >
-                    <span className="text-sm text-slate-900">{status}</span>
-                    {filters.status === status && <CheckCircle2 size={14} className="text-blue-500" />}
-                  </button>
-                ))}
-              </div>
+          {/* Collapsible Filters */}
+          <AnimatePresence>
+            {(showMobileFilters || window.innerWidth >= 1024) && (
+              <motion.div 
+                initial={window.innerWidth < 1024 ? { height: 0, opacity: 0 } : false}
+                animate={window.innerWidth < 1024 ? { height: 'auto', opacity: 1 } : false}
+                exit={window.innerWidth < 1024 ? { height: 0, opacity: 0 } : false}
+                className={cn(
+                  "w-full lg:contents",
+                  window.innerWidth < 1024 && "overflow-hidden"
+                )}
+              >
+                <div className="flex flex-col lg:contents gap-3 pt-3 lg:pt-0 border-t border-slate-100 lg:border-0 mt-3 lg:mt-0">
+                  <div className="lg:col-span-2 space-y-1">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 lg:block">Data</label>
+                    <div className="relative">
+                      <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
+                      <input 
+                        type="date"
+                        value={filters.startDate}
+                        onChange={e => setFilters({...filters, startDate: e.target.value})}
+                        onClick={(e) => (e.target as any).showPicker?.()}
+                        className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px] cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="lg:col-span-2 space-y-1 relative">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 lg:block">Código</label>
+                    <div 
+                      className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
+                      onClick={() => setShowCodeFilterList(!showCodeFilterList)}
+                    >
+                      <span className="truncate">{filters.serviceCode || 'Todos'}</span>
+                      <ChevronDown size={16} className="text-slate-400 ml-2 shrink-0 mr-1" />
+                    </div>
+
+                    {showCodeFilterList && (
+                      <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
+                        <button
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFilters({...filters, serviceCode: ''});
+                            setShowCodeFilterList(false);
+                          }}
+                        >
+                          <span className="text-sm text-slate-900">Todos</span>
+                          {!filters.serviceCode && <CheckCircle2 size={14} className="text-blue-500" />}
+                        </button>
+                        {(OM_CODES || []).map(code => (
+                          <button
+                            key={code}
+                            type="button"
+                            className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFilters({...filters, serviceCode: code});
+                              setShowCodeFilterList(false);
+                            }}
+                          >
+                            <span className="text-sm text-slate-900">{code}</span>
+                            {filters.serviceCode === code && <CheckCircle2 size={14} className="text-blue-500" />}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="lg:col-span-2 space-y-1 relative">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 lg:block">Status</label>
+                    <div 
+                      className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
+                      onClick={() => setShowStatusFilterList(!showStatusFilterList)}
+                    >
+                      <span className="truncate">{filters.status || 'Todos'}</span>
+                      <ChevronDown size={16} className="text-slate-400 ml-2 shrink-0 mr-1" />
+                    </div>
+
+                    {showStatusFilterList && (
+                      <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
+                        <button
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFilters({...filters, status: ''});
+                            setShowStatusFilterList(false);
+                          }}
+                        >
+                          <span className="text-sm text-slate-900">Todos</span>
+                          {!filters.status && <CheckCircle2 size={14} className="text-blue-500" />}
+                        </button>
+                        {ACTIVITY_STATUSES.map(status => (
+                          <button
+                            key={status}
+                            type="button"
+                            className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFilters({...filters, status: status as any});
+                              setShowStatusFilterList(false);
+                            }}
+                          >
+                            <span className="text-sm text-slate-900">{status}</span>
+                            {filters.status === status && <CheckCircle2 size={14} className="text-blue-500" />}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="lg:col-span-1">
+                    <Button 
+                      variant="outline" 
+                      className="h-[42px] w-full px-0 border-slate-200 hover:bg-slate-50 transition-colors shrink-0" 
+                      onClick={() => setFilters({
+                        startDate: getBrasiliaDateString(),
+                        serviceCode: '',
+                        status: '',
+                        search: ''
+                      })}
+                    >
+                      <X size={16} />
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
             )}
-          </div>
-
-          <div className="lg:col-span-1">
-            <Button 
-              variant="outline" 
-              className="h-[42px] w-full px-0 border-slate-200 hover:bg-slate-50 transition-colors shrink-0" 
-              onClick={() => setFilters({
-                startDate: getBrasiliaDateString(),
-                serviceCode: '',
-                status: '',
-                search: ''
-              })}
-            >
-              <X size={16} />
-            </Button>
-          </div>
+          </AnimatePresence>
         </div>
       </div>
 
@@ -4371,6 +4442,7 @@ function DashboardEmployeesView({ employees, activities, onUpdate, initialEmploy
 
 function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User, occurrences: Occurrence[], onUpdate: () => void }) {
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('Todas');
   const [filterCode, setFilterCode] = useState<string>('');
@@ -4446,121 +4518,166 @@ function DashboardOccurrencesView({ user, occurrences, onUpdate }: { user: User,
 
   return (
     <div className="flex flex-col gap-4 lg:gap-6 flex-1 min-h-0 no-scrollbar">
-      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
-          <div className="col-span-2 lg:col-span-4 space-y-1">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Busca</label>
-            <div className="relative">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input 
-                type="text"
-                placeholder="Buscar ocorrências..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
-              />
-            </div>
-          </div>
-
-          <div className="col-span-2 lg:col-span-2 space-y-1 relative">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Categoria</label>
-            <div 
-              className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
-              onClick={() => setShowCategoryFilterList(!showCategoryFilterList)}
-            >
-              <span className="truncate">{filterType || 'Todas'}</span>
-              <ChevronDown size={16} className="text-slate-400 ml-2 shrink-0 mr-1" />
-            </div>
-            
-            {showCategoryFilterList && (
-              <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
-                {['Todas', 'Segurança', 'Operacional', 'Ambiental', 'Outros'].map(type => (
-                  <button
-                    key={type}
-                    type="button"
-                    className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setFilterType(type);
-                      setShowCategoryFilterList(false);
-                    }}
-                  >
-                    <span className="text-sm text-slate-900">{type}</span>
-                    {filterType === type && <CheckCircle2 size={14} className="text-blue-500" />}
-                  </button>
-                ))}
+      <div className="bg-white p-4 lg:p-6 rounded-2xl border border-slate-200 shadow-sm relative z-[1010]">
+        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-3 items-end">
+          {/* Search Row */}
+          <div className="w-full lg:col-span-4 space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 lg:block hidden">Busca</label>
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input 
+                  type="text"
+                  placeholder="Buscar ocorrências..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm h-[42px]"
+                />
               </div>
-            )}
-          </div>
-
-          <div className="col-span-1 lg:col-span-3 space-y-1 relative">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Cód. Serviço</label>
-            <div 
-              className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
-              onClick={() => setShowCodeFilterList(!showCodeFilterList)}
-            >
-              <span className="truncate">{filterCode || 'Todos'}</span>
-              <ChevronDown size={16} className="text-slate-400 ml-2 shrink-0 mr-1" />
-            </div>
-            
-            {showCodeFilterList && (
-              <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
-                <button
-                  type="button"
-                  className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setFilterCode('');
-                    setShowCodeFilterList(false);
-                  }}
-                >
-                  <span className="text-sm text-slate-900">Todos</span>
-                  {!filterCode && <CheckCircle2 size={14} className="text-blue-500" />}
-                </button>
-                {OM_CODES.map(code => (
-                  <button
-                    key={code}
-                    type="button"
-                    className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setFilterCode(code);
-                      setShowCodeFilterList(false);
-                    }}
-                  >
-                    <span className="text-sm text-slate-900">{code}</span>
-                    {filterCode === code && <CheckCircle2 size={14} className="text-blue-500" />}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="col-span-1 lg:col-span-2 space-y-1">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Data</label>
-            <div className="relative">
-              <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
-              <input 
-                type="date"
-                value={filterDate}
-                onChange={(e) => setFilterDate(e.target.value)}
-                onClick={(e) => (e.target as any).showPicker?.()}
-                className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px] cursor-pointer"
-              />
+              <button 
+                onClick={() => setShowMobileFilters(!showMobileFilters)}
+                className={cn(
+                  "lg:hidden px-4 h-[42px] rounded-xl border font-bold text-[10px] uppercase tracking-wider transition-all flex items-center gap-2",
+                  showMobileFilters 
+                    ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/20" 
+                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                )}
+              >
+                <Filter size={14} />
+                Filtrar
+              </button>
             </div>
           </div>
 
-          <div className="col-span-2 lg:col-span-1">
-            <Button variant="outline" className="h-[42px] w-full px-4 border-slate-200 hover:bg-slate-50 flex items-center justify-center gap-2" onClick={() => {
-              setSearchQuery('');
-              setFilterType('Todas');
-              setFilterCode('');
-              setFilterDate('');
-            }}>
-              <X size={16} />
-              <span className="text-xs font-bold uppercase tracking-wider">Limpar</span>
-            </Button>
-          </div>
+          {/* Collapsible Filters */}
+          <AnimatePresence>
+            {(showMobileFilters || window.innerWidth >= 1024) && (
+              <motion.div 
+                initial={window.innerWidth < 1024 ? { height: 0, opacity: 0 } : false}
+                animate={window.innerWidth < 1024 ? { height: 'auto', opacity: 1 } : false}
+                exit={window.innerWidth < 1024 ? { height: 0, opacity: 0 } : false}
+                className={cn(
+                  "w-full lg:contents",
+                  window.innerWidth < 1024 && "overflow-hidden"
+                )}
+              >
+                <div className="flex flex-col lg:contents gap-3 pt-3 lg:pt-0 border-t border-slate-100 lg:border-0 mt-3 lg:mt-0">
+                  <div className="lg:col-span-2 space-y-1 relative">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 lg:block">Categoria</label>
+                    <div 
+                      className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
+                      onClick={() => setShowCategoryFilterList(!showCategoryFilterList)}
+                    >
+                      <span className="truncate">{filterType || 'Todas'}</span>
+                      <ChevronDown size={16} className="text-slate-400 ml-2 shrink-0 mr-1" />
+                    </div>
+                    
+                    {showCategoryFilterList && (
+                      <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
+                        {['Todas', 'Segurança', 'Operacional', 'Ambiental', 'Outros'].map(type => (
+                          <button
+                            key={type}
+                            type="button"
+                            className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFilterType(type);
+                              setShowCategoryFilterList(false);
+                            }}
+                          >
+                            <span className="text-sm text-slate-900">{type}</span>
+                            {filterType === type && <CheckCircle2 size={14} className="text-blue-500" />}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="lg:col-span-2 space-y-1 relative">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 lg:block">Código</label>
+                    <div 
+                      className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all outline-none shadow-sm h-[42px] cursor-pointer flex items-center justify-between"
+                      onClick={() => setShowCodeFilterList(!showCodeFilterList)}
+                    >
+                      <span className="truncate">{filterCode || 'Todos'}</span>
+                      <ChevronDown size={16} className="text-slate-400 ml-2 shrink-0 mr-1" />
+                    </div>
+                    
+                    {showCodeFilterList && (
+                      <div className="absolute z-[100] w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto top-full">
+                        <button
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFilterCode('');
+                            setShowCodeFilterList(false);
+                          }}
+                        >
+                          <span className="text-sm text-slate-900">Todos</span>
+                          {!filterCode && <CheckCircle2 size={14} className="text-blue-500" />}
+                        </button>
+                        {(OM_CODES || []).map(code => (
+                          <button
+                            key={code}
+                            type="button"
+                            className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center justify-between border-b border-slate-100 last:border-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFilterCode(code);
+                              setShowCodeFilterList(false);
+                            }}
+                          >
+                            <span className="text-sm text-slate-900">{code}</span>
+                            {filterCode === code && <CheckCircle2 size={14} className="text-blue-500" />}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="lg:col-span-2 space-y-1">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 lg:block">Data</label>
+                    <div className="relative">
+                      <Calendar size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 shrink-0 pointer-events-none" />
+                      <input 
+                        type="date"
+                        value={filterDate}
+                        onChange={(e) => setFilterDate(e.target.value)}
+                        onClick={(e) => (e.target as any).showPicker?.()}
+                        className="w-full pl-8 pr-1 py-1.5 bg-white border border-slate-200 rounded-xl text-base md:text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none shadow-sm text-slate-600 h-[42px] cursor-pointer"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-1">
+                    <Button 
+                      variant="outline" 
+                      className="h-[42px] w-full px-0 border-slate-200 hover:bg-slate-50 transition-colors shrink-0" 
+                      onClick={() => {
+                        setSearchQuery('');
+                        setFilterType('Todas');
+                        setFilterCode('');
+                        setFilterDate('');
+                      }}
+                    >
+                      <X size={16} />
+                    </Button>
+                  </div>
+
+                  <div className="lg:col-span-1">
+                    <Button 
+                      onClick={() => setShowAddModal(true)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 h-[42px] w-full rounded-xl flex items-center justify-center gap-2"
+                    >
+                      <Plus size={18} />
+                      <span className="lg:hidden text-xs font-bold uppercase tracking-wider">Novo</span>
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
