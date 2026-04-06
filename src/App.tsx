@@ -2092,33 +2092,48 @@ function DashboardNewRecordView({ user, locations, employees, onSuccess }: { use
   }, []);
 
   useEffect(() => {
-    captureLocation();
-    
-    let watchId: number;
-    if (navigator.geolocation) {
-      watchId = navigator.geolocation.watchPosition(
-        (position) => {
-          const acc = position.coords.accuracy;
-          setCurrentPos(prev => {
-            if (!prev || acc <= prev.accuracy) {
-              setGpsStatus('captured');
-              return {
-                latitude: roundCoord(position.coords.latitude),
-                longitude: roundCoord(position.coords.longitude),
-                accuracy: acc
-              };
-            }
-            return prev;
-          });
-        },
-        (err) => console.log('Radar GPS error:', err),
-        { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 }
-      );
+    // Evitamos chamar `captureLocation()` simultaneamente ao `watchPosition` para não causar duas requisições de GPS concorrentes (drenagem de bateria e conflitos)
+    if (!navigator.geolocation) {
+      setGpsStatus('error');
+      setError('Geolocalização não suportada');
+      return;
     }
+
+    setGpsStatus('requesting');
+    
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const acc = position.coords.accuracy;
+        setCurrentPos(prev => {
+          // Melhoria: Aceitamos a nova localização se não tivermos uma, 
+          // ou se a precisão for razoavelmente boa (< 100 metros), ou se for melhor que a anterior.
+          // Restringir a apenas `acc <= prev.accuracy` causava travamento da localização caso o usuário andasse e a precisão caísse ligeiramente.
+          if (!prev || acc <= prev.accuracy || acc < 100) {
+            setGpsStatus('captured');
+            return {
+              latitude: roundCoord(position.coords.latitude),
+              longitude: roundCoord(position.coords.longitude),
+              accuracy: acc
+            };
+          }
+          return prev;
+        });
+      },
+      (err) => {
+        console.log('Radar GPS error:', err);
+        // O status só é marcado como erro se não tivermos posição anterior válida para não perder a captura ao passar por um túnel, por exemplo.
+        setCurrentPos(prev => {
+          if (!prev) setGpsStatus('error');
+          return prev;
+        });
+      },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 }
+    );
+
     return () => {
-      if (watchId) navigator.geolocation.clearWatch(watchId);
+      navigator.geolocation.clearWatch(watchId);
     };
-  }, [captureLocation]);
+  }, []);
   const [searchEmp, setSearchEmp] = useState('');
   const [showEmpList, setShowEmpList] = useState(false);
   const [searchLoc, setSearchLoc] = useState('');
