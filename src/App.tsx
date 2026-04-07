@@ -1120,7 +1120,7 @@ export default function App() {
         <div className={cn(
           "flex-1 flex flex-col min-h-0 w-full mx-auto",
           activeTab === 'manager'
-            ? "max-w-none px-4 lg:px-8 overflow-hidden py-2 sm:py-3 lg:py-5"
+            ? "max-w-none px-4 lg:px-8 lg:overflow-hidden overflow-y-auto no-scrollbar py-2 sm:py-3 lg:py-5"
             : "max-w-[1440px] px-2 sm:px-3 lg:px-6 overflow-y-auto no-scrollbar py-2 sm:py-3 lg:py-6"
         )}>
           <ErrorBoundary>
@@ -3230,7 +3230,7 @@ function ManagerDashboard({ activities, locations, employees, onTabChange }: { a
         "bg-slate-900 rounded-2xl shadow-sm relative overflow-hidden transition-all duration-300 min-h-0",
         isMapFullscreen
           ? "fixed inset-0 z-[2000] rounded-none border-0 p-0"
-          : "flex-1 lg:h-auto border border-slate-200"
+          : "flex-1 min-h-[400px] lg:min-h-0 lg:h-auto border border-slate-200 shrink-0"
       )}>
         {/* Expand / Collapse Button */}
         <button
